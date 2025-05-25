@@ -58,17 +58,39 @@ export class Game extends Scene
     }
 
     createPhilosophers(map, layers) {
+        // Biotype emoji indicators
+        const biotypeEmojis = {
+            sanguine: "☀️",     // Sun - energetic, warm, social
+            choleric: "🔥",     // Fire - intense, driven, leadership
+            melancholic: "🌙",  // Moon - deep, introspective, contemplative
+            phlegmatic: "🌊"    // Water - calm, steady, flowing
+        };
+
+        // Philosopher-to-biotype mappings (matches backend)
+        const philosopherBiotypes = {
+            "socrates": "sanguine",
+            "aristotle": "choleric", 
+            "plato": "melancholic",
+            "descartes": "melancholic",
+            "leibniz": "choleric",
+            "ada_lovelace": "sanguine",
+            "turing": "melancholic",
+            "searle": "phlegmatic",
+            "chomsky": "choleric",
+            "dennett": "sanguine"
+        };
+
         const philosopherConfigs = [
-            { id: "socrates", name: "Socrates", defaultDirection: "right", roamRadius: 800 },
-            { id: "aristotle", name: "Aristotle", defaultDirection: "right", roamRadius: 700 },
-            { id: "plato", name: "Plato", defaultDirection: "front", roamRadius: 750 },
-            { id: "descartes", name: "Descartes", defaultDirection: "front", roamRadius: 650 },
-            { id: "leibniz", name: "Leibniz", defaultDirection: "front", roamRadius: 720 },
-            { id: "ada_lovelace", name: "Ada Lovelace", defaultDirection: "front", roamRadius: 680 },
-            { id: "turing", name: "Turing", defaultDirection: "front", roamRadius: 770 },
-            { id: "searle", name: "Searle", defaultDirection: "front", roamRadius: 730 },
-            { id: "chomsky", name: "Chomsky", defaultDirection: "front", roamRadius: 690 },
-            { id: "dennett", name: "Dennett", defaultDirection: "front", roamRadius: 710 },
+            { id: "socrates", name: `${biotypeEmojis[philosopherBiotypes["socrates"]]} Socrates`, defaultDirection: "right", roamRadius: 800 },
+            { id: "aristotle", name: `${biotypeEmojis[philosopherBiotypes["aristotle"]]} Aristotle`, defaultDirection: "right", roamRadius: 700 },
+            { id: "plato", name: `${biotypeEmojis[philosopherBiotypes["plato"]]} Plato`, defaultDirection: "front", roamRadius: 750 },
+            { id: "descartes", name: `${biotypeEmojis[philosopherBiotypes["descartes"]]} Descartes`, defaultDirection: "front", roamRadius: 650 },
+            { id: "leibniz", name: `${biotypeEmojis[philosopherBiotypes["leibniz"]]} Leibniz`, defaultDirection: "front", roamRadius: 720 },
+            { id: "ada_lovelace", name: `${biotypeEmojis[philosopherBiotypes["ada_lovelace"]]} Ada Lovelace`, defaultDirection: "front", roamRadius: 680 },
+            { id: "turing", name: `${biotypeEmojis[philosopherBiotypes["turing"]]} Turing`, defaultDirection: "front", roamRadius: 770 },
+            { id: "searle", name: `${biotypeEmojis[philosopherBiotypes["searle"]]} Searle`, defaultDirection: "front", roamRadius: 730 },
+            { id: "chomsky", name: `${biotypeEmojis[philosopherBiotypes["chomsky"]]} Chomsky`, defaultDirection: "front", roamRadius: 690 },
+            { id: "dennett", name: `${biotypeEmojis[philosopherBiotypes["dennett"]]} Dennett`, defaultDirection: "front", roamRadius: 710 },
             { 
                 id: "miguel", 
                 name: "Miguel", 
