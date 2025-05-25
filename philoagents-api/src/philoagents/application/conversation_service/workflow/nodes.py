@@ -50,6 +50,7 @@ async def conversation_node(state: PhilosopherState, config: RunnableConfig):
             )
             biotype_guidance = "\n- When appropriate, you may offer insights about health, lifestyle, emotional patterns, spiritual practices, or life purpose based on your biotype knowledge."
 
+
     response = await conversation_chain.ainvoke(
         {
             "messages": state["messages"],

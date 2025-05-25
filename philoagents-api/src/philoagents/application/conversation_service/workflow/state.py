@@ -25,12 +25,12 @@ class PhilosopherState(MessagesState):
     philosopher_name: str
     philosopher_perspective: str
     philosopher_style: str
-    biotype_id: Optional[str]
-    health_advice: Optional[str]
-    dietary_recommendations: Optional[str]
-    emotional_patterns: Optional[str]
-    spiritual_practices: Optional[str]
-    life_purpose_patterns: Optional[str]
+    biotype_id: Optional[str] = None
+    health_advice: Optional[str] = None
+    dietary_recommendations: Optional[str] = None
+    emotional_patterns: Optional[str] = None
+    spiritual_practices: Optional[str] = None
+    life_purpose_patterns: Optional[str] = None
     summary: str
 
 
