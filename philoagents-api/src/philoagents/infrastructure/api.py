@@ -58,7 +58,12 @@ async def chat(chat_message: ChatMessage):
             philosopher_perspective=philosopher.perspective,
             philosopher_style=philosopher.style,
             philosopher_context="",
-            philosopher=philosopher,
+            biotype_id=philosopher.biotype_id,
+            health_advice=philosopher.health_advice,
+            dietary_recommendations=philosopher.dietary_recommendations,
+            emotional_patterns=philosopher.emotional_patterns,
+            spiritual_practices=philosopher.spiritual_practices,
+            life_purpose_patterns=philosopher.life_purpose_patterns,
         )
         return {"response": response}
     except Exception as e:
@@ -98,7 +103,12 @@ async def websocket_chat(websocket: WebSocket):
                     philosopher_perspective=philosopher.perspective,
                     philosopher_style=philosopher.style,
                     philosopher_context="",
-                    philosopher=philosopher,
+                    biotype_id=philosopher.biotype_id,
+                    health_advice=philosopher.health_advice,
+                    dietary_recommendations=philosopher.dietary_recommendations,
+                    emotional_patterns=philosopher.emotional_patterns,
+                    spiritual_practices=philosopher.spiritual_practices,
+                    life_purpose_patterns=philosopher.life_purpose_patterns,
                 )
 
                 # Send initial message to indicate streaming has started

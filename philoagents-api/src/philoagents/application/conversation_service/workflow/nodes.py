@@ -22,32 +22,30 @@ async def conversation_node(state: PhilosopherState, config: RunnableConfig):
     biotype_context = ""
     biotype_guidance = ""
 
-    philosopher = state.get("philosopher")
-    if philosopher and philosopher.biotype_id:
+    biotype_id = state.get("biotype_id")
+    if biotype_id:
         biotype_sections = []
 
-        if philosopher.health_advice:
-            biotype_sections.append(f"Health Guidance: {philosopher.health_advice}")
-        if philosopher.dietary_recommendations:
+        if state.get("health_advice"):
+            biotype_sections.append(f"Health Guidance: {state['health_advice']}")
+        if state.get("dietary_recommendations"):
             biotype_sections.append(
-                f"Dietary Wisdom: {philosopher.dietary_recommendations}"
+                f"Dietary Wisdom: {state['dietary_recommendations']}"
             )
-        if philosopher.emotional_patterns:
+        if state.get("emotional_patterns"):
             biotype_sections.append(
-                f"Emotional Patterns: {philosopher.emotional_patterns}"
+                f"Emotional Patterns: {state['emotional_patterns']}"
             )
-        if philosopher.spiritual_practices:
+        if state.get("spiritual_practices"):
             biotype_sections.append(
-                f"Spiritual Practices: {philosopher.spiritual_practices}"
+                f"Spiritual Practices: {state['spiritual_practices']}"
             )
-        if philosopher.life_purpose_patterns:
-            biotype_sections.append(
-                f"Life Purpose: {philosopher.life_purpose_patterns}"
-            )
+        if state.get("life_purpose_patterns"):
+            biotype_sections.append(f"Life Purpose: {state['life_purpose_patterns']}")
 
         if biotype_sections:
             biotype_context = (
-                f"Biotype ({philosopher.biotype_id.title()}) Context:\n"
+                f"Biotype ({biotype_id.title()}) Context:\n"
                 + "\n\n".join(biotype_sections)
             )
             biotype_guidance = "\n- When appropriate, you may offer insights about health, lifestyle, emotional patterns, spiritual practices, or life purpose based on your biotype knowledge."

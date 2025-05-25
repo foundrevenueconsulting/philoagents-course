@@ -2,8 +2,6 @@ from typing import Optional
 
 from langgraph.graph import MessagesState
 
-from philoagents.domain.philosopher import Philosopher
-
 
 class PhilosopherState(MessagesState):
     """State class for the LangGraph workflow. It keeps track of the information necessary to maintain a coherent
@@ -14,7 +12,12 @@ class PhilosopherState(MessagesState):
         philosopher_name (str): The name of the philosopher.
         philosopher_perspective (str): The perspective of the philosopher about AI.
         philosopher_style (str): The style of the philosopher.
-        philosopher (Optional[Philosopher]): The full philosopher instance with potential biotype data.
+        biotype_id (Optional[str]): The biotype identifier for enhanced character.
+        health_advice (Optional[str]): Biotype-specific health guidance.
+        dietary_recommendations (Optional[str]): Biotype-specific dietary advice.
+        emotional_patterns (Optional[str]): Biotype-specific emotional patterns.
+        spiritual_practices (Optional[str]): Biotype-specific spiritual guidance.
+        life_purpose_patterns (Optional[str]): Biotype-specific life purpose insights.
         summary (str): A summary of the conversation. This is used to reduce the token usage of the model.
     """
 
@@ -22,7 +25,12 @@ class PhilosopherState(MessagesState):
     philosopher_name: str
     philosopher_perspective: str
     philosopher_style: str
-    philosopher: Optional[Philosopher]
+    biotype_id: Optional[str]
+    health_advice: Optional[str]
+    dietary_recommendations: Optional[str]
+    emotional_patterns: Optional[str]
+    spiritual_practices: Optional[str]
+    life_purpose_patterns: Optional[str]
     summary: str
 
 

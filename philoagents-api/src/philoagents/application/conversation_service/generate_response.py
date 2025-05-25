@@ -10,7 +10,6 @@ from philoagents.application.conversation_service.workflow.graph import (
 )
 from philoagents.application.conversation_service.workflow.state import PhilosopherState
 from philoagents.config import settings
-from philoagents.domain.philosopher import Philosopher
 
 
 async def get_response(
@@ -20,7 +19,12 @@ async def get_response(
     philosopher_perspective: str,
     philosopher_style: str,
     philosopher_context: str,
-    philosopher: Optional[Philosopher] = None,
+    biotype_id: Optional[str] = None,
+    health_advice: Optional[str] = None,
+    dietary_recommendations: Optional[str] = None,
+    emotional_patterns: Optional[str] = None,
+    spiritual_practices: Optional[str] = None,
+    life_purpose_patterns: Optional[str] = None,
     new_thread: bool = False,
 ) -> tuple[str, PhilosopherState]:
     """Run a conversation through the workflow graph.
@@ -68,7 +72,12 @@ async def get_response(
                     "philosopher_perspective": philosopher_perspective,
                     "philosopher_style": philosopher_style,
                     "philosopher_context": philosopher_context,
-                    "philosopher": philosopher,
+                    "biotype_id": biotype_id,
+                    "health_advice": health_advice,
+                    "dietary_recommendations": dietary_recommendations,
+                    "emotional_patterns": emotional_patterns,
+                    "spiritual_practices": spiritual_practices,
+                    "life_purpose_patterns": life_purpose_patterns,
                 },
                 config=config,
             )
@@ -85,7 +94,12 @@ async def get_streaming_response(
     philosopher_perspective: str,
     philosopher_style: str,
     philosopher_context: str,
-    philosopher: Optional[Philosopher] = None,
+    biotype_id: Optional[str] = None,
+    health_advice: Optional[str] = None,
+    dietary_recommendations: Optional[str] = None,
+    emotional_patterns: Optional[str] = None,
+    spiritual_practices: Optional[str] = None,
+    life_purpose_patterns: Optional[str] = None,
     new_thread: bool = False,
 ) -> AsyncGenerator[str, None]:
     """Run a conversation through the workflow graph with streaming response.
@@ -132,7 +146,12 @@ async def get_streaming_response(
                     "philosopher_perspective": philosopher_perspective,
                     "philosopher_style": philosopher_style,
                     "philosopher_context": philosopher_context,
-                    "philosopher": philosopher,
+                    "biotype_id": biotype_id,
+                    "health_advice": health_advice,
+                    "dietary_recommendations": dietary_recommendations,
+                    "emotional_patterns": emotional_patterns,
+                    "spiritual_practices": spiritual_practices,
+                    "life_purpose_patterns": life_purpose_patterns,
                 },
                 config=config,
                 stream_mode="messages",
