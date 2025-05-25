@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -38,14 +38,38 @@ class Philosopher(BaseModel):
         perspective (str): Description of the philosopher's theoretical views
             about AI.
         style (str): Description of the philosopher's talking style.
+        biotype_id (Optional[str]): Optional biotype identifier for enhanced character.
+        health_advice (Optional[str]): Biotype-specific health guidance.
+        dietary_recommendations (Optional[str]): Biotype-specific dietary advice.
+        emotional_patterns (Optional[str]): Biotype-specific emotional patterns.
+        spiritual_practices (Optional[str]): Biotype-specific spiritual guidance.
+        life_purpose_patterns (Optional[str]): Biotype-specific life purpose insights.
     """
 
     id: str = Field(description="Unique identifier for the philosopher")
     name: str = Field(description="Name of the philosopher")
     perspective: str = Field(
-        description="Description of the philosopher's theoretical views about AI"
+        description="Description of the philosopher's theoretical views about a life well lived"
     )
     style: str = Field(description="Description of the philosopher's talking style")
+    biotype_id: Optional[str] = Field(
+        default=None, description="Optional biotype identifier for enhanced character"
+    )
+    health_advice: Optional[str] = Field(
+        default=None, description="Biotype-specific health guidance"
+    )
+    dietary_recommendations: Optional[str] = Field(
+        default=None, description="Biotype-specific dietary advice"
+    )
+    emotional_patterns: Optional[str] = Field(
+        default=None, description="Biotype-specific emotional patterns"
+    )
+    spiritual_practices: Optional[str] = Field(
+        default=None, description="Biotype-specific spiritual guidance"
+    )
+    life_purpose_patterns: Optional[str] = Field(
+        default=None, description="Biotype-specific life purpose insights"
+    )
 
     def __str__(self) -> str:
         return f"Philosopher(id={self.id}, name={self.name}, perspective={self.perspective}, style={self.style})"

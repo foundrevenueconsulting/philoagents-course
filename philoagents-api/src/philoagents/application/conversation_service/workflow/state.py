@@ -1,4 +1,8 @@
+from typing import Optional
+
 from langgraph.graph import MessagesState
+
+from philoagents.domain.philosopher import Philosopher
 
 
 class PhilosopherState(MessagesState):
@@ -10,6 +14,7 @@ class PhilosopherState(MessagesState):
         philosopher_name (str): The name of the philosopher.
         philosopher_perspective (str): The perspective of the philosopher about AI.
         philosopher_style (str): The style of the philosopher.
+        philosopher (Optional[Philosopher]): The full philosopher instance with potential biotype data.
         summary (str): A summary of the conversation. This is used to reduce the token usage of the model.
     """
 
@@ -17,6 +22,7 @@ class PhilosopherState(MessagesState):
     philosopher_name: str
     philosopher_perspective: str
     philosopher_style: str
+    philosopher: Optional[Philosopher]
     summary: str
 
 

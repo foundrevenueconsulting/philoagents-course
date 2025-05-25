@@ -18,6 +18,40 @@ async def conversation_node(state: PhilosopherState, config: RunnableConfig):
     summary = state.get("summary", "")
     conversation_chain = get_philosopher_response_chain()
 
+    # Build biotype context if available
+    biotype_context = ""
+    biotype_guidance = ""
+
+    philosopher = state.get("philosopher")
+    if philosopher and philosopher.biotype_id:
+        biotype_sections = []
+
+        if philosopher.health_advice:
+            biotype_sections.append(f"Health Guidance: {philosopher.health_advice}")
+        if philosopher.dietary_recommendations:
+            biotype_sections.append(
+                f"Dietary Wisdom: {philosopher.dietary_recommendations}"
+            )
+        if philosopher.emotional_patterns:
+            biotype_sections.append(
+                f"Emotional Patterns: {philosopher.emotional_patterns}"
+            )
+        if philosopher.spiritual_practices:
+            biotype_sections.append(
+                f"Spiritual Practices: {philosopher.spiritual_practices}"
+            )
+        if philosopher.life_purpose_patterns:
+            biotype_sections.append(
+                f"Life Purpose: {philosopher.life_purpose_patterns}"
+            )
+
+        if biotype_sections:
+            biotype_context = (
+                f"Biotype ({philosopher.biotype_id.title()}) Context:\n"
+                + "\n\n".join(biotype_sections)
+            )
+            biotype_guidance = "\n- When appropriate, you may offer insights about health, lifestyle, emotional patterns, spiritual practices, or life purpose based on your biotype knowledge."
+
     response = await conversation_chain.ainvoke(
         {
             "messages": state["messages"],
@@ -25,11 +59,13 @@ async def conversation_node(state: PhilosopherState, config: RunnableConfig):
             "philosopher_name": state["philosopher_name"],
             "philosopher_perspective": state["philosopher_perspective"],
             "philosopher_style": state["philosopher_style"],
+            "biotype_context": biotype_context,
+            "biotype_guidance": biotype_guidance,
             "summary": summary,
         },
         config,
     )
-    
+
     return {"messages": response}
 
 

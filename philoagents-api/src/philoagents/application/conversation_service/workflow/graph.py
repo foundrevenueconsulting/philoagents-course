@@ -26,23 +26,21 @@ def create_workflow_graph():
     graph_builder.add_node("summarize_conversation_node", summarize_conversation_node)
     graph_builder.add_node("summarize_context_node", summarize_context_node)
     graph_builder.add_node("connector_node", connector_node)
-    
+
     # Define the flow
     graph_builder.add_edge(START, "conversation_node")
     graph_builder.add_conditional_edges(
         "conversation_node",
         tools_condition,
-        {
-            "tools": "retrieve_philosopher_context",
-            END: "connector_node"
-        }
+        {"tools": "retrieve_philosopher_context", END: "connector_node"},
     )
     graph_builder.add_edge("retrieve_philosopher_context", "summarize_context_node")
     graph_builder.add_edge("summarize_context_node", "conversation_node")
     graph_builder.add_conditional_edges("connector_node", should_summarize_conversation)
     graph_builder.add_edge("summarize_conversation_node", END)
-    
+
     return graph_builder
+
 
 # Compiled without a checkpointer. Used for LangGraph Studio
 graph = create_workflow_graph().compile()
