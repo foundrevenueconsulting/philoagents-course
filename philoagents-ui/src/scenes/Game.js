@@ -81,16 +81,16 @@ export class Game extends Scene
         };
 
         const philosopherConfigs = [
-            { id: "socrates", name: `${biotypeEmojis[philosopherBiotypes["socrates"]]} Socrates`, defaultDirection: "right", roamRadius: 800 },
-            { id: "aristotle", name: `${biotypeEmojis[philosopherBiotypes["aristotle"]]} Aristotle`, defaultDirection: "right", roamRadius: 700 },
-            { id: "plato", name: `${biotypeEmojis[philosopherBiotypes["plato"]]} Plato`, defaultDirection: "front", roamRadius: 750 },
-            { id: "descartes", name: `${biotypeEmojis[philosopherBiotypes["descartes"]]} Descartes`, defaultDirection: "front", roamRadius: 650 },
-            { id: "leibniz", name: `${biotypeEmojis[philosopherBiotypes["leibniz"]]} Leibniz`, defaultDirection: "front", roamRadius: 720 },
-            { id: "ada_lovelace", name: `${biotypeEmojis[philosopherBiotypes["ada_lovelace"]]} Ada Lovelace`, defaultDirection: "front", roamRadius: 680 },
-            { id: "turing", name: `${biotypeEmojis[philosopherBiotypes["turing"]]} Turing`, defaultDirection: "front", roamRadius: 770 },
-            { id: "searle", name: `${biotypeEmojis[philosopherBiotypes["searle"]]} Searle`, defaultDirection: "front", roamRadius: 730 },
-            { id: "chomsky", name: `${biotypeEmojis[philosopherBiotypes["chomsky"]]} Chomsky`, defaultDirection: "front", roamRadius: 690 },
-            { id: "dennett", name: `${biotypeEmojis[philosopherBiotypes["dennett"]]} Dennett`, defaultDirection: "front", roamRadius: 710 },
+            { id: "socrates", name: `${biotypeEmojis[philosopherBiotypes["socrates"]]} Socrates`, spawnName: "Socrates", defaultDirection: "right", roamRadius: 800 },
+            { id: "aristotle", name: `${biotypeEmojis[philosopherBiotypes["aristotle"]]} Aristotle`, spawnName: "Aristotle", defaultDirection: "right", roamRadius: 700 },
+            { id: "plato", name: `${biotypeEmojis[philosopherBiotypes["plato"]]} Plato`, spawnName: "Plato", defaultDirection: "front", roamRadius: 750 },
+            { id: "descartes", name: `${biotypeEmojis[philosopherBiotypes["descartes"]]} Descartes`, spawnName: "Descartes", defaultDirection: "front", roamRadius: 650 },
+            { id: "leibniz", name: `${biotypeEmojis[philosopherBiotypes["leibniz"]]} Leibniz`, spawnName: "Leibniz", defaultDirection: "front", roamRadius: 720 },
+            { id: "ada_lovelace", name: `${biotypeEmojis[philosopherBiotypes["ada_lovelace"]]} Ada Lovelace`, spawnName: "Ada Lovelace", defaultDirection: "front", roamRadius: 680 },
+            { id: "turing", name: `${biotypeEmojis[philosopherBiotypes["turing"]]} Turing`, spawnName: "Turing", defaultDirection: "front", roamRadius: 770 },
+            { id: "searle", name: `${biotypeEmojis[philosopherBiotypes["searle"]]} Searle`, spawnName: "Searle", defaultDirection: "front", roamRadius: 730 },
+            { id: "chomsky", name: `${biotypeEmojis[philosopherBiotypes["chomsky"]]} Chomsky`, spawnName: "Chomsky", defaultDirection: "front", roamRadius: 690 },
+            { id: "dennett", name: `${biotypeEmojis[philosopherBiotypes["dennett"]]} Dennett`, spawnName: "Dennett", defaultDirection: "front", roamRadius: 710 },
             { 
                 id: "miguel", 
                 name: "Miguel", 
@@ -110,7 +110,7 @@ export class Game extends Scene
         this.philosophers = [];
         
         philosopherConfigs.forEach(config => {
-            const spawnPoint = map.findObject("Objects", (obj) => obj.name === config.name);
+            const spawnPoint = map.findObject("Objects", (obj) => obj.name === (config.spawnName || config.name));
             
             this[config.id] = new Character(this, {
                 id: config.id,
