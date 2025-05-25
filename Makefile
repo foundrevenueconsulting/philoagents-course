@@ -15,6 +15,19 @@ infrastructure-up:
 infrastructure-stop:
 	docker compose stop
 
+infrastructure-restart:
+	@echo "🔄 Restarting containers to pick up code changes..."
+	docker compose stop
+	docker compose up --build -d
+
+infrastructure-logs:
+	@echo "📝 Showing container logs (press Ctrl+C to exit)..."
+	docker compose logs -f
+
+infrastructure-status:
+	@echo "📊 Container status:"
+	docker compose ps
+
 check-docker-image:
 	@if [ -z "$$(docker images -q philoagents-course-api 2> /dev/null)" ]; then \
 		echo "Error: philoagents-course-api Docker image not found."; \

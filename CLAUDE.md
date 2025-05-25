@@ -21,6 +21,11 @@ cp .env.example .env  # Configure API keys as needed
 make infrastructure-up      # Start all services (MongoDB, API, UI)
 make infrastructure-stop    # Stop all services
 make infrastructure-build   # Build Docker images without running
+
+# IMPORTANT: After code changes, restart containers to pick up changes
+make infrastructure-restart    # Quick restart with rebuild
+make infrastructure-logs       # View container logs
+make infrastructure-status     # Check container status
 ```
 
 **Development in philoagents-api/:**
