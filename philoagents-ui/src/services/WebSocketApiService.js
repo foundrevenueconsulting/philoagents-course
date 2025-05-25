@@ -19,9 +19,11 @@ class WebSocketApiService {
     const isHttps = window.location.protocol === 'https:';
     
     if (isHttps) {
-      console.log('Using GitHub Codespaces');
-      const currentHostname = window.location.hostname;
-      return `ws://${currentHostname.replace('8080', '8000')}`;
+      console.log('Using production/staging environment');
+      // Use same domain with wss protocol for Vercel deployment
+      const protocol = 'wss:';
+      const hostname = window.location.hostname;
+      return `${protocol}//${hostname}/api`;
     }
     
     return 'ws://localhost:8000';

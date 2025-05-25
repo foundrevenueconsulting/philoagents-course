@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
     opik_tracer.flush()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,

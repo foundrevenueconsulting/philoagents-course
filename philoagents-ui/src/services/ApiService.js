@@ -3,10 +3,11 @@ class ApiService {
     const isHttps = window.location.protocol === 'https:';
     
     if (isHttps) {
-      console.log('Using GitHub Codespaces');
-      const currentHostname = window.location.hostname;
-      this.apiUrl = `https://${currentHostname.replace('8080', '8000')}`;
+      console.log('Using production/staging environment');
+      // Use relative API path for Vercel deployment
+      this.apiUrl = '/api';
     } else {
+      // Local development
       this.apiUrl = 'http://localhost:8000';
     }
   }

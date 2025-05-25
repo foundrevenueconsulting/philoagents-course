@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/philoagents/infrastructure/api.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "src/philoagents/infrastructure/api.py"
+    }
+  ],
+  "functions": {
+    "src/philoagents/infrastructure/api.py": {
+      "runtime": "python3.12"
+    }
+  }
+}
