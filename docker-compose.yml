@@ -24,8 +24,8 @@ services:
     env_file:
       - ./philoagents-api/.env
     volumes:
-      - ./philoagents-api/src:/app/src
-      - ./philoagents-api/philoagents:/app/philoagents
+      - ./philoagents-api/src/philoagents:/app/philoagents
+      - ./philoagents-api/tools:/app/tools
     networks:
       - philoagents-network
   ui:
