@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, AsyncGenerator, Union
+from typing import Any, AsyncGenerator, Optional, Union
 
 from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver
@@ -10,6 +10,7 @@ from philoagents.application.conversation_service.workflow.graph import (
 )
 from philoagents.application.conversation_service.workflow.state import PhilosopherState
 from philoagents.config import settings
+from philoagents.domain.philosopher import Philosopher
 
 
 async def get_response(
@@ -19,6 +20,7 @@ async def get_response(
     philosopher_perspective: str,
     philosopher_style: str,
     philosopher_context: str,
+    philosopher: Optional[Philosopher] = None,
     new_thread: bool = False,
 ) -> tuple[str, PhilosopherState]:
     """Run a conversation through the workflow graph.
@@ -66,6 +68,7 @@ async def get_response(
                     "philosopher_perspective": philosopher_perspective,
                     "philosopher_style": philosopher_style,
                     "philosopher_context": philosopher_context,
+                    "philosopher": philosopher,
                 },
                 config=config,
             )
@@ -82,6 +85,7 @@ async def get_streaming_response(
     philosopher_perspective: str,
     philosopher_style: str,
     philosopher_context: str,
+    philosopher: Optional[Philosopher] = None,
     new_thread: bool = False,
 ) -> AsyncGenerator[str, None]:
     """Run a conversation through the workflow graph with streaming response.
@@ -128,6 +132,7 @@ async def get_streaming_response(
                     "philosopher_perspective": philosopher_perspective,
                     "philosopher_style": philosopher_style,
                     "philosopher_context": philosopher_context,
+                    "philosopher": philosopher,
                 },
                 config=config,
                 stream_mode="messages",
