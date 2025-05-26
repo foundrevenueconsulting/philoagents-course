@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from opik.integrations.langchain import OpikTracer
 from pydantic import BaseModel
 
@@ -132,6 +133,56 @@ async def websocket_chat(websocket: WebSocket):
 
     except WebSocketDisconnect:
         pass
+
+
+@app.post("/chat/stream")
+async def chat_stream(chat_message: ChatMessage):
+    """Stream chat responses using Server-Sent Events for Vercel compatibility."""
+    try:
+        philosopher_factory = PhilosopherFactory()
+        philosopher = philosopher_factory.get_philosopher(chat_message.philosopher_id)
+
+        async def generate_stream():
+            try:
+                # Send initial streaming indicator
+                yield "event: streaming\ndata: true\n\n"
+                
+                # Stream the response chunks
+                async for chunk in get_streaming_response(
+                    messages=chat_message.message,
+                    philosopher_id=chat_message.philosopher_id,
+                    philosopher_name=philosopher.name,
+                    philosopher_perspective=philosopher.perspective,
+                    philosopher_style=philosopher.style,
+                    philosopher_context="",
+                    biotype_id=philosopher.biotype_id,
+                    health_advice=philosopher.health_advice,
+                    dietary_recommendations=philosopher.dietary_recommendations,
+                    emotional_patterns=philosopher.emotional_patterns,
+                    spiritual_practices=philosopher.spiritual_practices,
+                    life_purpose_patterns=philosopher.life_purpose_patterns,
+                ):
+                    yield f"event: chunk\ndata: {chunk}\n\n"
+                
+                # Send completion indicator
+                yield "event: streaming\ndata: false\n\n"
+                yield "event: complete\ndata: done\n\n"
+                
+            except Exception as e:
+                yield f"event: error\ndata: {str(e)}\n\n"
+
+        return StreamingResponse(
+            generate_stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/reset-memory")

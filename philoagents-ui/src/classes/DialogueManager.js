@@ -1,5 +1,5 @@
 import ApiService from '../services/ApiService';
-import WebSocketApiService from '../services/WebSocketApiService';
+import StreamingApiService from '../services/StreamingApiService';
 
 class DialogueManager {
   constructor(scene) {
@@ -76,7 +76,7 @@ class DialogueManager {
       if (this.activePhilosopher.defaultMessage) {
         await this.handleDefaultMessage();
       } else {
-        await this.handleWebSocketMessage();
+        await this.handleStreamingMessage();
       }
       
       this.currentMessage = '';
@@ -94,24 +94,22 @@ class DialogueManager {
     await this.streamText(apiResponse);
   }
 
-  async handleWebSocketMessage() {
+  async handleStreamingMessage() {
     this.dialogueBox.show('', true);
     this.isStreaming = true;
     this.streamingText = '';
     
     try {
-      await this.processWebSocketMessage();
+      await this.processStreamingMessage();
     } catch (error) {
-      console.error('WebSocket error:', error);
+      console.error('Streaming error:', error);
       await this.fallbackToRegularApi();
     } finally {
       this.isTyping = false;
     }
   }
 
-  async processWebSocketMessage() {
-    await WebSocketApiService.connect();
-    
+  async processStreamingMessage() {
     const callbacks = {
       onMessage: () => { 
         this.finishStreaming();
@@ -128,18 +126,13 @@ class DialogueManager {
       }
     };
     
-    await WebSocketApiService.sendMessage(
+    await StreamingApiService.sendMessage(
       this.activePhilosopher,
       this.currentMessage,
       callbacks
     );
     
-    while (this.isStreaming) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
     this.currentMessage = '';
-    WebSocketApiService.disconnect();
   }
 
   finishStreaming() {

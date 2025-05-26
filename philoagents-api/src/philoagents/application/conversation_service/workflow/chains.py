@@ -38,7 +38,7 @@ def get_philosopher_response_chain():
 
 
 def get_conversation_summary_chain(summary: str = ""):
-    model = get_chat_model(model_name=settings.GROQ_LLM_MODEL_SUMMARY)
+    model = get_chat_model(model_name=settings.GROQ_LLM_MODEL_CONTEXT_SUMMARY)
 
     summary_message = EXTEND_SUMMARY_PROMPT if summary else SUMMARY_PROMPT
 

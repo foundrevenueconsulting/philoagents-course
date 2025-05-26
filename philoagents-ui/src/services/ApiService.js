@@ -25,7 +25,7 @@ class ApiService {
 
   async sendMessage(philosopher, message) {
     try {
-      const data = await this.request('/chat', 'POST', {
+      const data = await this.request('/api/chat', 'POST', {
         message,
         philosopher_id: philosopher.id
       });
@@ -43,7 +43,7 @@ class ApiService {
 
   async resetMemory() {
     try {
-      const response = await fetch(`${this.apiUrl}/reset-memory`, {
+      const response = await fetch(`${this.apiUrl}/api/reset-memory`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
