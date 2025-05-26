@@ -16,17 +16,11 @@ class WebSocketApiService {
   }
 
   determineWebSocketBaseUrl() {
-    const isHttps = window.location.protocol === 'https:';
+    // Use environment variable or fallback to local development
+    const apiUrl = process.env.VITE_API_URL || 'http://localhost:8000';
     
-    if (isHttps) {
-      console.log('Using production/staging environment');
-      // Use same domain with wss protocol for Vercel deployment
-      const protocol = 'wss:';
-      const hostname = window.location.hostname;
-      return `${protocol}//${hostname}/api`;
-    }
-    
-    return 'ws://localhost:8000';
+    // Convert HTTP(S) URL to WebSocket URL
+    return apiUrl.replace(/^https?:/, apiUrl.startsWith('https:') ? 'wss:' : 'ws:');
   }
 
   connect() {
@@ -122,7 +116,7 @@ class WebSocketApiService {
       }));
     } catch (error) {
       console.error('Error sending message via WebSocket:', error);
-      return this.getFallbackResponse(philosopher);
+      return this.getFallbackResponse();
     }
   }
 
@@ -146,7 +140,7 @@ class WebSocketApiService {
     }
   }
 
-  getFallbackResponse(philosopher) {
+  getFallbackResponse() {
     return "I'm so tired right now, I can't talk. I'm going to sleep now.";
   }
 

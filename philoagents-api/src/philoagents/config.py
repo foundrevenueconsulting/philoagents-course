@@ -14,21 +14,13 @@ class Settings(BaseSettings):
     GROQ_LLM_MODEL: str = "llama-3.3-70b-versatile"
     GROQ_LLM_MODEL_CONTEXT_SUMMARY: str = "llama-3.1-8b-instant"
 
-    # --- OpenAI Configuration (Required for evaluation) ---
-    OPENAI_API_KEY: str
+    # --- OpenAI Configuration (Optional for evaluation) ---
+    OPENAI_API_KEY: str | None = None
 
     # --- MongoDB Configuration ---
     MONGO_URI: str = Field(
-        default="mongodb://philoagents:philoagents@local_dev_atlas:27017/?directConnection=true",
-        description="Connection URI for the local MongoDB Atlas instance.",
+        description="Connection URI for MongoDB Atlas instance.",
     )
-
-
-    # --- REMOTE MongoDB Configuration ---
-    # MONGO_URI: str = Field(
-    #     default="mongodb+srv://local:y9On1PgkBCuRvRR3@foundrevenue.jcxs66m.mongodb.net/?retryWrites=true&w=majority&appName=foundRevenue",
-    #     description="Connection URI for the remote MongoDB Atlas instance.",
-    # )
 
     MONGO_DB_NAME: str = "philoagents"
     MONGO_STATE_CHECKPOINT_COLLECTION: str = "philosopher_state_checkpoints"

@@ -1,15 +1,7 @@
 class ApiService {
   constructor() {
-    const isHttps = window.location.protocol === 'https:';
-    
-    if (isHttps) {
-      console.log('Using production/staging environment');
-      // Use relative API path for Vercel deployment
-      this.apiUrl = '/api';
-    } else {
-      // Local development
-      this.apiUrl = 'http://localhost:8000';
-    }
+    // Use environment variable or fallback to local development
+    this.apiUrl = process.env.VITE_API_URL || 'http://localhost:8000';
   }
 
   async request(endpoint, method, data) {
