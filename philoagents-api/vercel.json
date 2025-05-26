@@ -14,13 +14,7 @@
   ],
   "functions": {
     "src/philoagents/infrastructure/api.py": {
-      "runtime": "python3.12",
-      "env": {
-        "GROQ_API_KEY": "@groq_api_key",
-        "OPENAI_API_KEY": "@openai_api_key",
-        "MONGO_URI": "@mongo_uri",
-        "COMET_API_KEY": "@comet_api_key"
-      }
+      "runtime": "python3.12"
     }
   }
 }
