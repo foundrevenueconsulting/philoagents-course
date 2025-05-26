@@ -16,8 +16,8 @@ class WebSocketApiService {
   }
 
   determineWebSocketBaseUrl() {
-    // Use environment variable or fallback to local development
-    const apiUrl = process.env.VITE_API_URL || 'http://localhost:8000';
+    // Use global variable defined by webpack
+    const apiUrl = API_URL;
     
     // Convert HTTP(S) URL to WebSocket URL
     return apiUrl.replace(/^https?:/, apiUrl.startsWith('https:') ? 'wss:' : 'ws:');

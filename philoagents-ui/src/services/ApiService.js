@@ -1,7 +1,7 @@
 class ApiService {
   constructor() {
-    // Use environment variable or fallback to local development
-    this.apiUrl = process.env.VITE_API_URL || 'http://localhost:8000';
+    // Use global variable defined by webpack
+    this.apiUrl = API_URL;
   }
 
   async request(endpoint, method, data) {
