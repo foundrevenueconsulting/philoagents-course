@@ -60,10 +60,10 @@ export class Game extends Scene
     createPhilosophers(map, layers) {
         // Biotype emoji indicators
         const biotypeEmojis = {
-            sanguine: "☀️",     // Sun - energetic, warm, social
-            choleric: "🔥",     // Fire - intense, driven, leadership
-            melancholic: "🌙",  // Moon - deep, introspective, contemplative
-            phlegmatic: "🌊"    // Water - calm, steady, flowing
+            sanguine: "🜁",     // Air
+            choleric: "🜂",     // Fire
+            melancholic: "🜃",  // Water
+            phlegmatic: "🜄"    // Earth
         };
 
         // Philosopher-to-biotype mappings (matches backend)

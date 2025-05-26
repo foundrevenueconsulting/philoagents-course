@@ -22,6 +22,14 @@ class Settings(BaseSettings):
         default="mongodb://philoagents:philoagents@local_dev_atlas:27017/?directConnection=true",
         description="Connection URI for the local MongoDB Atlas instance.",
     )
+
+
+    # --- REMOTE MongoDB Configuration ---
+    # MONGO_URI: str = Field(
+    #     default="mongodb+srv://local:y9On1PgkBCuRvRR3@foundrevenue.jcxs66m.mongodb.net/?retryWrites=true&w=majority&appName=foundRevenue",
+    #     description="Connection URI for the remote MongoDB Atlas instance.",
+    # )
+
     MONGO_DB_NAME: str = "philoagents"
     MONGO_STATE_CHECKPOINT_COLLECTION: str = "philosopher_state_checkpoints"
     MONGO_STATE_WRITES_COLLECTION: str = "philosopher_state_writes"

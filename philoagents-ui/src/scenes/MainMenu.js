@@ -7,7 +7,7 @@ export class MainMenu extends Scene {
 
     create() {
         this.add.image(0, 0, 'background').setOrigin(0, 0);
-        this.add.image(510, 260, 'logo').setScale(0.55);
+        this.add.image(510, 260, 'image').setScale(0.45);
 
         const centerX = this.cameras.main.width / 2;
         const startY = 524;
@@ -21,9 +21,9 @@ export class MainMenu extends Scene {
             this.showInstructions();
         });
 
-        this.createButton(centerX, startY + buttonSpacing * 2, 'Support Philoagents', () => {
-            window.open('https://github.com/neural-maze/philoagents-course', '_blank');
-        });
+        // this.createButton(centerX, startY + buttonSpacing * 2, 'Support Philoagents', () => {
+        //     window.open('https://github.com/neural-maze/philoagents-course', '_blank');
+        // });
     }
 
     createButton(x, y, text, callback) {
