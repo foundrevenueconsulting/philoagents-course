@@ -21,6 +21,7 @@ COPY --from=builder /app/.venv /app/.venv
 
 # Copy the application into the container.
 COPY src/philoagents philoagents/
+COPY tools tools/
 
 # Replace HuggingFace embeddings with OpenAI for Railway
 COPY embeddings.railway.py philoagents/application/rag/embeddings.py
