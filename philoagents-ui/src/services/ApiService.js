@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/browser";
+
 class ApiService {
   constructor() {
     // Use global variable defined by webpack
@@ -17,7 +19,19 @@ class ApiService {
     const response = await fetch(url, options);
     
     if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+      const error = new Error(`API error: ${response.status} ${response.statusText}`);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'ApiService',
+          method: 'request'
+        },
+        extra: {
+          url: url,
+          status: response.status,
+          statusText: response.statusText
+        }
+      });
+      throw error;
     }
     
     return response.json();
@@ -33,6 +47,16 @@ class ApiService {
       return data.response;
     } catch (error) {
       console.error('Error sending message to API:', error);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'ApiService',
+          method: 'sendMessage'
+        },
+        extra: {
+          philosopher: philosopher.id,
+          message: message
+        }
+      });
       return this.getFallbackResponse(philosopher);
     }
   }
@@ -57,6 +81,12 @@ class ApiService {
       return await response.json();
     } catch (error) {
       console.error('Error resetting memory:', error);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'ApiService',
+          method: 'resetMemory'
+        }
+      });
       throw error;
     }
   }

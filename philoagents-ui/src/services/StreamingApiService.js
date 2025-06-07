@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/browser";
+
 class StreamingApiService {
   constructor() {
     // Use global variable defined by webpack
@@ -10,6 +12,17 @@ class StreamingApiService {
       return await this.sendStreamingMessage(philosopher, message, callbacks);
     } catch (error) {
       console.warn('Streaming failed, falling back to regular API:', error);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'StreamingApiService',
+          method: 'sendMessage'
+        },
+        extra: {
+          philosopher: philosopher.id,
+          message: message,
+          fallbackUsed: true
+        }
+      });
       // Fallback to regular API
       return await this.sendRegularMessage(philosopher, message);
     }
@@ -30,7 +43,18 @@ class StreamingApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = new Error(`HTTP error! status: ${response.status}`);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'StreamingApiService',
+          method: 'sendStreamingMessage'
+        },
+        extra: {
+          url: url,
+          status: response.status
+        }
+      });
+      throw error;
     }
 
     const reader = response.body.getReader();
@@ -77,7 +101,15 @@ class StreamingApiService {
               }
               break;
             } else if (currentEventType === 'error') {
-              throw new Error(data);
+              const error = new Error(data);
+              Sentry.captureException(error, {
+                tags: {
+                  service: 'StreamingApiService',
+                  method: 'sendStreamingMessage',
+                  type: 'streaming_error'
+                }
+              });
+              throw error;
             }
           }
         }
@@ -105,7 +137,18 @@ class StreamingApiService {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = new Error(`HTTP error! status: ${response.status}`);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'StreamingApiService',
+          method: 'sendRegularMessage'
+        },
+        extra: {
+          url: url,
+          status: response.status
+        }
+      });
+      throw error;
     }
 
     const data = await response.json();
@@ -132,6 +175,12 @@ class StreamingApiService {
       return await response.json();
     } catch (error) {
       console.error('Error resetting memory:', error);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'StreamingApiService',
+          method: 'resetMemory'
+        }
+      });
       throw error;
     }
   }

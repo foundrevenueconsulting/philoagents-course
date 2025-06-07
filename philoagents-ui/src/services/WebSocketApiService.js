@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/browser";
+
 class WebSocketApiService {
   constructor() {
     // Initialize connection-related properties
@@ -50,6 +52,12 @@ class WebSocketApiService {
 
       this.socket.onerror = (error) => {
         console.error('WebSocket error:', error);
+        Sentry.captureException(error, {
+          tags: {
+            service: 'WebSocketApiService',
+            method: 'connect'
+          }
+        });
         clearTimeout(timeoutId);
         this.connectionPromise = null;
         reject(error);
@@ -70,6 +78,13 @@ class WebSocketApiService {
     
     if (data.error) {
       console.error('WebSocket error:', data.error);
+      Sentry.captureMessage(data.error, {
+        level: 'error',
+        tags: {
+          service: 'WebSocketApiService',
+          method: 'handleMessage'
+        }
+      });
       return;
     }
     
@@ -116,6 +131,16 @@ class WebSocketApiService {
       }));
     } catch (error) {
       console.error('Error sending message via WebSocket:', error);
+      Sentry.captureException(error, {
+        tags: {
+          service: 'WebSocketApiService',
+          method: 'sendMessage'
+        },
+        extra: {
+          philosopher: philosopher.id,
+          message: message
+        }
+      });
       return this.getFallbackResponse();
     }
   }
