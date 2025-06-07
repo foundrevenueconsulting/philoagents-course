@@ -25,6 +25,7 @@ COPY tools tools/
 
 # Replace HuggingFace embeddings with OpenAI for Railway
 COPY embeddings.railway.py philoagents/application/rag/embeddings.py
+COPY retrievers.railway.py philoagents/application/rag/retrievers.py
 
 # Set PATH to include the virtual environment.
 ENV PATH="/app/.venv/bin:$PATH"
