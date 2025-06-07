@@ -16,7 +16,7 @@ services:
     container_name: philoagents-api
     build:
       context: ./philoagents-api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
     environment:
       - MONGO_URI=mongodb://philoagents:philoagents@local_dev_atlas:27017/?directConnection=true
     ports:
