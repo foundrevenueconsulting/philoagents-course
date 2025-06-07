@@ -1,6 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
-
-[deploy]
-startCommand = "fastapi run philoagents/infrastructure/api.py --port $PORT --host 0.0.0.0"
