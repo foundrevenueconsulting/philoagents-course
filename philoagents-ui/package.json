@@ -4,9 +4,9 @@
     "main": "src/main.js",
     "scripts": {
         "dev": "node log.js dev & webpack-dev-server --config webpack/config.js --open",
-        "build": "node log.js build & webpack --config webpack/config.prod.js",
-        "dev-nolog": "webpack-dev-server --config webpack/config.js --open",
-        "build-nolog": "webpack --config webpack/config.prod.js"
+        "build": "webpack --config webpack/config.prod.js",
+        "build-nolog": "webpack --config webpack/config.prod.js",
+        "start": "npm run build && node server.js"
     },
     "repository": {
         "type": "git",
@@ -35,6 +35,7 @@
         "webpack-merge": "^5.10.0"
     },
     "dependencies": {
-        "phaser": "^3.88.2"
+        "phaser": "^3.88.2",
+        "express": "^4.18.2"
     }
 }
