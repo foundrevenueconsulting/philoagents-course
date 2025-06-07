@@ -1,21 +1,29 @@
-FROM node:18-alpine
+FROM node:18-alpine as builder
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (production only)
+RUN npm ci --only=production
 
 # Copy project files
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application (without logging to avoid external requests)
+RUN npm run build-nolog
 
-# Expose port 8080 (matches webpack dev server port)
-EXPOSE 8080
+FROM nginx:alpine
 
-# Start the development server
-CMD ["npm", "run", "dev"]
+# Copy built application from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

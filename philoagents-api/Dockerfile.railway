@@ -6,9 +6,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Set the working directory.
 WORKDIR /app
 
-# Install the application dependencies (production only).
-COPY uv.lock pyproject.toml README.md ./
-RUN uv sync --frozen --no-cache --no-dev
+# Copy Railway-optimized dependencies and create lockfile
+COPY pyproject.railway.toml pyproject.toml
+COPY README.md ./
+RUN uv lock && uv sync --frozen --no-cache --no-dev
 
 FROM python:3.11-slim
 
@@ -20,6 +21,9 @@ COPY --from=builder /app/.venv /app/.venv
 
 # Copy the application into the container.
 COPY src/philoagents philoagents/
+
+# Replace HuggingFace embeddings with OpenAI for Railway
+COPY embeddings.railway.py philoagents/application/rag/embeddings.py
 
 # Set PATH to include the virtual environment.
 ENV PATH="/app/.venv/bin:$PATH"
