@@ -4,8 +4,8 @@
     "main": "src/main.js",
     "scripts": {
         "dev": "node log.js dev & webpack-dev-server --config webpack/config.js --open",
-        "build": "webpack --config webpack/config.prod.js",
-        "build-nolog": "webpack --config webpack/config.prod.js",
+        "build": "node --max-old-space-size=4096 node_modules/.bin/webpack --config webpack/config.prod.js",
+        "build-nolog": "node --max-old-space-size=4096 node_modules/.bin/webpack --config webpack/config.prod.js",
         "start": "npm run build && node server.js"
     },
     "repository": {

@@ -21,6 +21,25 @@ module.exports = {
         maxEntrypointSize: 2500000,
         maxAssetSize: 1200000
     },
+    stats: {
+        children: false,
+        modules: false,
+        entrypoints: false
+    },
+    optimization: {
+        splitChunks: false,
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                parallel: false,
+                terserOptions: {
+                    output: {
+                        comments: false
+                    }
+                }
+            })
+        ]
+    },
     module: {
         rules: [
             {
@@ -38,17 +57,6 @@ module.exports = {
                 test: /\.(gif|png|jpe?g|svg|xml|glsl)$/i,
                 use: "file-loader"
             }
-        ]
-    },
-    optimization: {
-        minimizer: [
-            new TerserPlugin({
-                terserOptions: {
-                    output: {
-                        comments: false
-                    }
-                }
-            })
         ]
     },
     plugins: [
