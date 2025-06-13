@@ -13,11 +13,15 @@ export class MainMenu extends Scene {
         const startY = 524;
         const buttonSpacing = 70;
 
-        this.createButton(centerX, startY, 'Let\'s Play!', () => {
-            this.scene.start('Game');
+        this.createButton(centerX, startY, 'Single Player', () => {
+            this.scene.start('Game', { multiplayerMode: false });
         });
 
-        this.createButton(centerX, startY + buttonSpacing, 'Instructions', () => {
+        this.createButton(centerX, startY + buttonSpacing, 'Multiplayer', () => {
+            this.startMultiplayerGame();
+        });
+
+        this.createButton(centerX, startY + buttonSpacing * 2, 'Instructions', () => {
             this.showInstructions();
         });
 
@@ -218,5 +222,14 @@ export class MainMenu extends Scene {
         
         elements.closeButton.destroy();
         elements.closeText.destroy();
+    }
+
+    startMultiplayerGame() {
+        console.log('Starting multiplayer game');
+        this.scene.start('Game', { 
+            multiplayerMode: true,
+            characterType: 'sophia', // Default character, same as single player
+            playerName: `Player_${Math.floor(Math.random() * 1000)}`
+        });
     }
 }

@@ -18,11 +18,12 @@
 
 ```bash
 .
-├── philoagents-api/     # Backend API containing the PhiloAgents simulation engine (Python)
-└── philoagents-ui/      # Frontend UI for the game (Node)
+├── philoagents-api/         # Backend API containing the PhiloAgents simulation engine (Python)
+├── philoagents-ui/          # Frontend UI for the single-player game (Node)
+└── philoagents-multiplayer/ # Multiplayer game server using Colyseus framework (Node)
 ```
 
-The course will focus only on the `philoagents-api` application that contains all the agent simulation logic. The `philoagents-ui` application is used to play the game.
+The course will focus primarily on the `philoagents-api` application that contains all the agent simulation logic. The `philoagents-ui` application is used to play the single-player game, while the `philoagents-multiplayer` server enables real-time multiplayer interactions between players and philosophers.
 
 ## 👔 Dataset
 

@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import Character from '../classes/Character';
 import DialogueBox from '../classes/DialogueBox';
 import DialogueManager from '../classes/DialogueManager';
+import { multiplayerService } from '../services/MultiplayerService';
 
 export class Game extends Scene
 {
@@ -17,9 +18,25 @@ export class Game extends Scene
         this.dialogueManager = null;
         this.philosophers = [];
         this.labelsVisible = true;
+        
+        // Multiplayer properties
+        this.isMultiplayerMode = false;
+        this.gameConfig = {};
+        this.localPlayer = null;
+        this.remotePlayers = new Map();
+        this.multiplayerConnected = false;
+        this.connectionStatusText = null;
     }
 
-    create ()
+    init(data) {
+        // Initialize game configuration from scene data
+        this.gameConfig = data || {};
+        this.isMultiplayerMode = this.gameConfig.multiplayerMode || false;
+        
+        console.log('Game scene initialized with config:', this.gameConfig);
+    }
+
+    async create ()
     {
         const map = this.createTilemap();
         const tileset = this.addTileset(map);
@@ -28,6 +45,11 @@ export class Game extends Scene
         let maxDialogueHeight = 200;
 
         this.createPhilosophers(map, layers);
+
+        // Setup multiplayer if enabled
+        if (this.isMultiplayerMode) {
+            await this.setupMultiplayer();
+        }
 
         this.setupPlayer(map, layers.worldLayer);
         const camera = this.setupCamera(map);
@@ -55,6 +77,11 @@ export class Game extends Scene
         // Initialize the dialogue manager
         this.dialogueManager = new DialogueManager(this);
         this.dialogueManager.initialize(this.dialogueBox);
+
+        // Setup connection status display for multiplayer
+        if (this.isMultiplayerMode) {
+            this.setupConnectionStatusDisplay();
+        }
     }
 
     createPhilosophers(map, layers) {
@@ -145,6 +172,11 @@ export class Game extends Scene
     }
 
     checkPhilosopherInteraction() {
+        // Early return if player is not ready
+        if (!this.player) {
+            return;
+        }
+        
         let nearbyPhilosopher = null;
 
         for (const philosopher of this.philosophers) {
@@ -156,17 +188,25 @@ export class Game extends Scene
         
         if (nearbyPhilosopher) {
             if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-                if (!this.dialogueBox.isVisible()) {
+                if (!this.dialogueBox || !this.dialogueBox.isVisible()) {
+                    // Send multiplayer event when starting dialogue
+                    if (this.isMultiplayerMode && this.multiplayerConnected) {
+                        multiplayerService.sendPhilosopherInteraction(nearbyPhilosopher.id, 'start');
+                    }
                     this.dialogueManager.startDialogue(nearbyPhilosopher);
                 } else if (!this.dialogueManager.isTyping) {
                     this.dialogueManager.continueDialogue();
                 }
             }
             
-            if (this.dialogueBox.isVisible()) {
+            if (this.dialogueBox && this.dialogueBox.isVisible()) {
                 nearbyPhilosopher.facePlayer(this.player);
             }
-        } else if (this.dialogueBox.isVisible()) {
+        } else if (this.dialogueBox && this.dialogueBox.isVisible()) {
+            // Send multiplayer event when ending dialogue
+            if (this.isMultiplayerMode && this.multiplayerConnected && this.activePhilosopher) {
+                multiplayerService.sendPhilosopherInteraction(this.activePhilosopher.id, 'end');
+            }
             this.dialogueManager.closeDialogue();
         }
     }
@@ -194,9 +234,39 @@ export class Game extends Scene
 
     setupPlayer(map, worldLayer) {
         const spawnPoint = map.findObject("Objects", (obj) => obj.name === "Spawn Point");
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, "sophia", "sophia-front")
-            .setSize(30, 40)
-            .setOffset(0, 6);
+        
+        // Determine character type and atlas
+        const characterType = this.isMultiplayerMode ? this.gameConfig.characterType : 'sophia';
+        const atlasKey = characterType === 'ada' ? 'ada' : characterType; // Handle ada_lovelace -> ada mapping
+        
+        console.log('🎮 Setting up player:', { characterType, atlasKey, isMultiplayer: this.isMultiplayerMode });
+        
+        // Check if atlas exists
+        if (!this.textures.exists(atlasKey)) {
+            console.error(`❌ Atlas '${atlasKey}' not found! Available textures:`, this.textures.list);
+            // Fallback to a known working atlas
+            const fallbackAtlas = 'sophia';
+            console.log(`🔄 Falling back to atlas: ${fallbackAtlas}`);
+            this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, fallbackAtlas, 'sophia-front')
+                .setSize(30, 40)
+                .setOffset(0, 6);
+        } else {
+            this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, atlasKey, `${characterType}-front`)
+                .setSize(30, 40)
+                .setOffset(0, 6);
+        }
+        
+        console.log('✅ Player created:', !!this.player, 'Body exists:', !!this.player?.body);
+
+        // Store reference for multiplayer
+        if (this.isMultiplayerMode) {
+            this.localPlayer = this.player;
+            this.localPlayer.characterType = characterType;
+            this.localPlayer.playerId = multiplayerService.getLocalPlayerId();
+            
+            // Add player name label for multiplayer
+            this.addPlayerNameLabel(this.localPlayer, this.gameConfig.playerName || 'You');
+        }
 
         this.physics.add.collider(this.player, worldLayer);
         
@@ -204,29 +274,34 @@ export class Game extends Scene
             this.physics.add.collider(this.player, philosopher.sprite);
         });
 
-        this.createPlayerAnimations();
+        this.createPlayerAnimations(characterType);
 
         // Set world bounds for physics
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.physics.world.setBoundsCollision(true, true, true, true);
     }
 
-    createPlayerAnimations() {
+    createPlayerAnimations(characterType = 'sophia') {
         const anims = this.anims;
+        const atlasKey = characterType === 'ada' ? 'ada' : characterType;
+        
         const animConfig = [
-            { key: "sophia-left-walk", prefix: "sophia-left-walk-" },
-            { key: "sophia-right-walk", prefix: "sophia-right-walk-" },
-            { key: "sophia-front-walk", prefix: "sophia-front-walk-" },
-            { key: "sophia-back-walk", prefix: "sophia-back-walk-" }
+            { key: `${characterType}-left-walk`, prefix: `${characterType}-left-walk-` },
+            { key: `${characterType}-right-walk`, prefix: `${characterType}-right-walk-` },
+            { key: `${characterType}-front-walk`, prefix: `${characterType}-front-walk-` },
+            { key: `${characterType}-back-walk`, prefix: `${characterType}-back-walk-` }
         ];
         
         animConfig.forEach(config => {
-            anims.create({
-                key: config.key,
-                frames: anims.generateFrameNames("sophia", { prefix: config.prefix, start: 0, end: 8, zeroPad: 4 }),
-                frameRate: 10,
-                repeat: -1,
-            });
+            // Only create animation if it doesn't already exist
+            if (!anims.exists(config.key)) {
+                anims.create({
+                    key: config.key,
+                    frames: anims.generateFrameNames(atlasKey, { prefix: config.prefix, start: 0, end: 8, zeroPad: 4 }),
+                    frameRate: 10,
+                    repeat: -1,
+                });
+            }
         });
     }
 
@@ -252,7 +327,7 @@ export class Game extends Scene
         
         // Add ESC key for pause menu
         this.input.keyboard.on('keydown-ESC', () => {
-            if (!this.dialogueBox.isVisible()) {
+            if (!this.dialogueBox || !this.dialogueBox.isVisible()) {
                 this.scene.pause();
                 this.scene.launch('PauseMenu');
             }
@@ -284,24 +359,41 @@ export class Game extends Scene
     }
 
     update(time, delta) {
-        const isInDialogue = this.dialogueBox.isVisible();
+        const isInDialogue = this.dialogueBox && this.dialogueBox.isVisible();
         
         if (!isInDialogue) {
-            this.updatePlayerMovement();
+            const wasMoving = this.updatePlayerMovement();
+            
+            // Send multiplayer updates if player moved
+            if (wasMoving && this.isMultiplayerMode) {
+                this.sendPlayerUpdate();
+            }
         }
         
         this.checkPhilosopherInteraction();
         
-        this.philosophers.forEach(philosopher => {
-            philosopher.update(this.player, isInDialogue);
-        });
+        if (this.player) {
+            this.philosophers.forEach(philosopher => {
+                philosopher.update(this.player, isInDialogue);
+            });
+        }
         
         if (this.controls) {
             this.controls.update(delta);
         }
+
+        // Update player name labels
+        if (this.isMultiplayerMode) {
+            this.updatePlayerNameLabels();
+        }
     }
 
     updatePlayerMovement() {
+        // Early return if player or player body is not ready
+        if (!this.player || !this.player.body) {
+            return false;
+        }
+        
         const speed = 175;
         const prevVelocity = this.player.body.velocity.clone();
         this.player.body.setVelocity(0);
@@ -323,20 +415,24 @@ export class Game extends Scene
         const currentVelocity = this.player.body.velocity.clone();
         const isMoving = Math.abs(currentVelocity.x) > 0 || Math.abs(currentVelocity.y) > 0;
         
+        // Get character type for animations
+        const characterType = this.isMultiplayerMode ? this.gameConfig.characterType : 'sophia';
+        const atlasKey = characterType === 'ada' ? 'ada' : characterType;
+        
         if (this.cursors.left.isDown && isMoving) {
-            this.player.anims.play("sophia-left-walk", true);
+            this.player.anims.play(`${characterType}-left-walk`, true);
         } else if (this.cursors.right.isDown && isMoving) {
-            this.player.anims.play("sophia-right-walk", true);
+            this.player.anims.play(`${characterType}-right-walk`, true);
         } else if (this.cursors.up.isDown && isMoving) {
-            this.player.anims.play("sophia-back-walk", true);
+            this.player.anims.play(`${characterType}-back-walk`, true);
         } else if (this.cursors.down.isDown && isMoving) {
-            this.player.anims.play("sophia-front-walk", true);
+            this.player.anims.play(`${characterType}-front-walk`, true);
         } else {
             this.player.anims.stop();
-            if (prevVelocity.x < 0) this.player.setTexture("sophia", "sophia-left");
-            else if (prevVelocity.x > 0) this.player.setTexture("sophia", "sophia-right");
-            else if (prevVelocity.y < 0) this.player.setTexture("sophia", "sophia-back");
-            else if (prevVelocity.y > 0) this.player.setTexture("sophia", "sophia-front");
+            if (prevVelocity.x < 0) this.player.setTexture(atlasKey, `${characterType}-left`);
+            else if (prevVelocity.x > 0) this.player.setTexture(atlasKey, `${characterType}-right`);
+            else if (prevVelocity.y < 0) this.player.setTexture(atlasKey, `${characterType}-back`);
+            else if (prevVelocity.y > 0) this.player.setTexture(atlasKey, `${characterType}-front`);
             else {
                 // If prevVelocity is zero, maintain current direction
                 // Get current texture frame name
@@ -352,9 +448,11 @@ export class Game extends Scene
                 else if (currentFrame.includes("front")) direction = "front";
                 
                 // Set the static texture for that direction
-                this.player.setTexture("sophia", `sophia-${direction}`);
+                this.player.setTexture(atlasKey, `${characterType}-${direction}`);
             }
         }
+        
+        return isMoving;
     }
 
     togglePhilosopherLabels(visible) {
@@ -363,5 +461,311 @@ export class Game extends Scene
                 philosopher.nameLabel.setVisible(visible);
             }
         });
+    }
+
+    // Multiplayer methods
+    async setupMultiplayer() {
+        console.log('🎮 Game: Setting up multiplayer connection...');
+        console.log(`   └─ Player: ${this.gameConfig.playerName}`);
+        console.log(`   └─ Character: ${this.gameConfig.characterType}`);
+        
+        try {
+            const connected = await multiplayerService.joinRoom(
+                this.gameConfig.playerName,
+                this.gameConfig.characterType
+            );
+
+            if (connected) {
+                this.multiplayerConnected = true;
+                console.log('🎉 Game: Successfully connected to multiplayer room');
+                this.setupMultiplayerEvents();
+            } else {
+                console.warn('⚠️ Game: Failed to connect to multiplayer, falling back to single player');
+                this.fallbackToSinglePlayer();
+            }
+        } catch (error) {
+            console.error('💥 Game: Multiplayer setup failed:', error);
+            console.error('   └─ Error message:', error.message);
+            console.error('   └─ Stack:', error.stack);
+            this.fallbackToSinglePlayer();
+        }
+    }
+
+    setupMultiplayerEvents() {
+        console.log('🎯 Game: Setting up multiplayer event callbacks...');
+        
+        // Handle new players joining
+        multiplayerService.onPlayerJoined((playerId, playerData) => {
+            console.log(`🎮 Game: Player joined callback - ${playerId}`);
+            if (playerId !== multiplayerService.getLocalPlayerId()) {
+                this.createRemotePlayer(playerId, playerData);
+            }
+        });
+
+        // Handle players leaving
+        multiplayerService.onPlayerLeft((playerId, playerData) => {
+            console.log(`🎮 Game: Player left callback - ${playerId}`);
+            this.removeRemotePlayer(playerId);
+        });
+
+        // Handle player movement updates
+        multiplayerService.onPlayerMoved((playerId, playerData) => {
+            console.log(`🎮 Game: Player moved callback - ${playerId}`);
+            this.updateRemotePlayer(playerId, playerData);
+        });
+
+        // Handle game events
+        multiplayerService.onGameEvent((event) => {
+            console.log('🎮 Game: Game event callback:', event);
+            this.handleMultiplayerGameEvent(event);
+        });
+
+        // Handle connection errors
+        multiplayerService.onError((error) => {
+            console.error('🎮 Game: Multiplayer error callback:', error);
+            this.showConnectionError(error);
+        });
+
+        // Handle room state changes
+        multiplayerService.onStateChange((state) => {
+            console.log('Room state updated:', state);
+        });
+    }
+
+    createRemotePlayer(playerId, playerData) {
+        console.log(`Creating remote player: ${playerId}`, playerData);
+        
+        // Create remote player sprite
+        const characterType = playerData.characterType || 'sophia';
+        const atlasKey = characterType === 'ada' ? 'ada' : characterType;
+        
+        const remotePlayer = this.physics.add.sprite(
+            playerData.x || 400, 
+            playerData.y || 300, 
+            atlasKey, 
+            `${characterType}-front`
+        )
+        .setSize(30, 40)
+        .setOffset(0, 6)
+        .setTint(0xcccccc); // Slightly transparent for remote players
+
+        remotePlayer.characterType = characterType;
+        remotePlayer.playerId = playerId;
+        
+        // Create animations for this character type
+        this.createPlayerAnimations(characterType);
+        
+        // Add player name label
+        this.addPlayerNameLabel(remotePlayer, playerData.playerName || playerId);
+        
+        // Add collisions
+        this.physics.add.collider(remotePlayer, this.player);
+        this.philosophers.forEach(philosopher => {
+            this.physics.add.collider(remotePlayer, philosopher.sprite);
+        });
+
+        this.remotePlayers.set(playerId, remotePlayer);
+    }
+
+    removeRemotePlayer(playerId) {
+        const remotePlayer = this.remotePlayers.get(playerId);
+        if (remotePlayer) {
+            if (remotePlayer.nameLabel) {
+                remotePlayer.nameLabel.destroy();
+            }
+            remotePlayer.destroy();
+            this.remotePlayers.delete(playerId);
+        }
+    }
+
+    updateRemotePlayer(playerId, playerData) {
+        const remotePlayer = this.remotePlayers.get(playerId);
+        if (remotePlayer) {
+            // Smoothly interpolate position
+            this.tweens.add({
+                targets: remotePlayer,
+                x: playerData.x,
+                y: playerData.y,
+                duration: 100,
+                ease: 'Linear'
+            });
+
+            // Update animation if provided
+            if (playerData.animation) {
+                remotePlayer.anims.play(playerData.animation, true);
+            } else {
+                remotePlayer.anims.stop();
+                if (playerData.direction) {
+                    remotePlayer.setTexture(remotePlayer.texture.key, `${remotePlayer.characterType}-${playerData.direction}`);
+                }
+            }
+        }
+    }
+
+    addPlayerNameLabel(player, name) {
+        if (player.nameLabel) {
+            player.nameLabel.destroy();
+        }
+        
+        player.nameLabel = this.add.text(player.x, player.y - 50, name, {
+            fontSize: '14px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setOrigin(0.5).setDepth(25);
+    }
+
+    setupConnectionStatusDisplay() {
+        this.connectionStatusText = this.add.text(10, 10, 'Connecting...', {
+            fontSize: '16px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setScrollFactor(0).setDepth(50);
+
+        // Update status based on connection
+        if (this.multiplayerConnected) {
+            this.connectionStatusText.setText(`Connected (${multiplayerService.getPlayerCount()} players)`);
+            this.connectionStatusText.setColor('#00ff00');
+        }
+    }
+
+    handleMultiplayerGameEvent(event) {
+        console.log('Handling multiplayer game event:', event);
+        
+        switch (event.type) {
+            case 'philosopher_interaction':
+                this.handlePhilosopherInteractionEvent(event);
+                break;
+            case 'chat_message':
+                this.handleChatMessage(event);
+                break;
+            default:
+                console.log('Unknown multiplayer event type:', event.type);
+        }
+    }
+
+    handlePhilosopherInteractionEvent(event) {
+        const philosopher = this.philosophers.find(p => p.id === event.philosopherId);
+        if (philosopher) {
+            // Show visual indicator for ongoing interactions
+            if (event.action === 'start') {
+                this.showPhilosopherBusyIndicator(philosopher, event.playerName);
+            } else if (event.action === 'end') {
+                this.hidePhilosopherBusyIndicator(philosopher);
+            }
+        }
+    }
+
+    showPhilosopherBusyIndicator(philosopher, playerName) {
+        if (philosopher.busyIndicator) {
+            philosopher.busyIndicator.destroy();
+        }
+        
+        philosopher.busyIndicator = this.add.text(
+            philosopher.sprite.x,
+            philosopher.sprite.y - 70,
+            `💬 ${playerName}`,
+            {
+                fontSize: '12px',
+                fontFamily: 'Arial',
+                color: '#ffff00',
+                stroke: '#000000',
+                strokeThickness: 2
+            }
+        ).setOrigin(0.5).setDepth(26);
+    }
+
+    hidePhilosopherBusyIndicator(philosopher) {
+        if (philosopher.busyIndicator) {
+            philosopher.busyIndicator.destroy();
+            philosopher.busyIndicator = null;
+        }
+    }
+
+    handleChatMessage(event) {
+        // Simple chat message display (could be enhanced with a proper chat UI)
+        console.log(`${event.playerName}: ${event.message}`);
+    }
+
+    showConnectionError(error) {
+        if (this.connectionStatusText) {
+            this.connectionStatusText.setText('Connection Error');
+            this.connectionStatusText.setColor('#ff0000');
+        }
+    }
+
+    fallbackToSinglePlayer() {
+        console.log('Falling back to single player mode');
+        this.isMultiplayerMode = false;
+        this.multiplayerConnected = false;
+        
+        if (this.connectionStatusText) {
+            this.connectionStatusText.setText('Single Player Mode');
+            this.connectionStatusText.setColor('#ffff00');
+        }
+    }
+
+    sendPlayerUpdate() {
+        if (this.isMultiplayerMode && this.multiplayerConnected && this.localPlayer) {
+            // Additional null checks to prevent errors
+            if (!this.localPlayer.anims || typeof this.localPlayer.x !== 'number' || typeof this.localPlayer.y !== 'number') {
+                console.warn('⚠️ LocalPlayer not ready for updates:', {
+                    hasAnims: !!this.localPlayer.anims,
+                    hasX: typeof this.localPlayer.x,
+                    hasY: typeof this.localPlayer.y,
+                    hasFrame: !!this.localPlayer.frame
+                });
+                return;
+            }
+            
+            const currentAnim = this.localPlayer.anims.currentAnim;
+            const animationKey = currentAnim ? currentAnim.key : null;
+            
+            // Determine direction from current frame
+            let direction = 'front';
+            if (this.localPlayer.frame && this.localPlayer.frame.name) {
+                const currentFrame = this.localPlayer.frame.name;
+                if (currentFrame.includes('left')) direction = 'left';
+                else if (currentFrame.includes('right')) direction = 'right';
+                else if (currentFrame.includes('back')) direction = 'back';
+                else if (currentFrame.includes('front')) direction = 'front';
+            }
+
+            multiplayerService.sendPlayerUpdate(
+                this.localPlayer.x,
+                this.localPlayer.y,
+                animationKey,
+                direction
+            );
+        }
+    }
+
+    updatePlayerNameLabels() {
+        // Update local player label
+        if (this.localPlayer && this.localPlayer.nameLabel) {
+            this.localPlayer.nameLabel.setPosition(this.localPlayer.x, this.localPlayer.y - 50);
+        }
+        
+        // Update remote player labels
+        this.remotePlayers.forEach(remotePlayer => {
+            if (remotePlayer.nameLabel) {
+                remotePlayer.nameLabel.setPosition(remotePlayer.x, remotePlayer.y - 50);
+            }
+        });
+    }
+
+    shutdown() {
+        // Clean up multiplayer connection when scene is destroyed
+        if (this.isMultiplayerMode && this.multiplayerConnected) {
+            multiplayerService.leaveRoom();
+        }
+    }
+
+    destroy() {
+        // Additional cleanup
+        this.shutdown();
     }
 }

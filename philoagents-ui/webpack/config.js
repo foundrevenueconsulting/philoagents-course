@@ -11,6 +11,11 @@ module.exports = {
         path: path.resolve(process.cwd(), 'dist'),
         filename: "bundle.min.js"
     },
+    resolve: {
+        fallback: {
+            "process": require.resolve("process/browser")
+        }
+    },
     module: {
         rules: [
             {
@@ -43,7 +48,13 @@ module.exports = {
             "typeof PLUGIN_CAMERA3D": JSON.stringify(false),
             "typeof PLUGIN_FBINSTANT": JSON.stringify(false),
             "typeof FEATURE_SOUND": JSON.stringify(true),
-            "API_URL": JSON.stringify(process.env.API_URL || 'http://localhost:8000')
+            "API_URL": JSON.stringify(process.env.API_URL || 'http://localhost:8000'),
+            "process.env": JSON.stringify({
+                NODE_ENV: process.env.NODE_ENV || 'development'
+            })
+        }),
+        new webpack.ProvidePlugin({
+            process: 'process'
         }),
         new HtmlWebpackPlugin({
             template: "./index.html"
