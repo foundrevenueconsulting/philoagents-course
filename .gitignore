@@ -140,6 +140,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!philoagents-nextjs/src/lib/
 lib64/
 parts/
 sdist/
