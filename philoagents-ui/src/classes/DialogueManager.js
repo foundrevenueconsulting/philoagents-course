@@ -1,5 +1,6 @@
 import ApiService from '../services/ApiService';
 import StreamingApiService from '../services/StreamingApiService';
+import WebSocketApiService from '../services/WebSocketApiService';
 
 class DialogueManager {
   constructor(scene) {
