@@ -1,6 +1,20 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the Phaser game component to avoid SSR issues
+const PhaserGame = dynamic(() => import('@/components/game/PhaserGame'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-screen bg-gray-900">
+      <div className="text-white text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+        <p>Loading PhiloAgents...</p>
+      </div>
+    </div>
+  )
+});
 
 export default async function GamePage() {
   let user = null;
@@ -30,32 +44,8 @@ export default async function GamePage() {
         </div>
       </nav>
 
-      <div className="pt-16 h-screen flex items-center justify-center">
-        <div className="text-center text-white">
-          <h2 className="text-4xl font-bold mb-4">Game Coming Soon</h2>
-          <p className="text-gray-300 mb-8 max-w-md">
-            Welcome{user?.firstName ? ` ${user.firstName}` : ''}! The Phaser.js game integration is currently in development. 
-            This page will soon house the full interactive philosophy world.
-          </p>
-          
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
-            <h3 className="text-xl font-semibold mb-4">What&apos;s Coming:</h3>
-            <ul className="text-left space-y-2 text-gray-300">
-              <li>• Interactive 2D world with multiple philosophers</li>
-              <li>• Real-time AI conversations</li>
-              <li>• Multiplayer support with other users</li>
-              <li>• Persistent conversation history</li>
-              <li>• Character customization</li>
-            </ul>
-          </div>
-
-          <Link
-            href="/dashboard"
-            className="mt-8 inline-block bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            Return to Dashboard
-          </Link>
-        </div>
+      <div className="pt-16 h-screen">
+        <PhaserGame className="w-full h-full" />
       </div>
     </div>
   );
