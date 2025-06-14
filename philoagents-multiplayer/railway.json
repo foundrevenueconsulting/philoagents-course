@@ -1,0 +1,40 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "sleepApplication": false,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "regions": ["us-west1"],
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "ENABLE_MONITOR": "false",
+        "ENABLE_PLAYGROUND": "false",
+        "MAX_PLAYERS_PER_ROOM": "10",
+        "WORLD_WIDTH": "1600",
+        "WORLD_HEIGHT": "1200",
+        "SPAWN_RADIUS": "200",
+        "INACTIVE_TIMEOUT_MS": "300000"
+      }
+    },
+    "development": {
+      "variables": {
+        "NODE_ENV": "development",
+        "ENABLE_MONITOR": "true",
+        "ENABLE_PLAYGROUND": "true",
+        "MAX_PLAYERS_PER_ROOM": "5",
+        "WORLD_WIDTH": "1600",
+        "WORLD_HEIGHT": "1200",
+        "SPAWN_RADIUS": "200",
+        "INACTIVE_TIMEOUT_MS": "180000"
+      }
+    }
+  }
+}

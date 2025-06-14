@@ -25,6 +25,7 @@ async def get_response(
     emotional_patterns: Optional[str] = None,
     spiritual_practices: Optional[str] = None,
     life_purpose_patterns: Optional[str] = None,
+    user_id: Optional[str] = None,
     new_thread: bool = False,
 ) -> tuple[str, PhilosopherState]:
     """Run a conversation through the workflow graph.
@@ -58,8 +59,10 @@ async def get_response(
             graph = graph_builder.compile(checkpointer=checkpointer)
             opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
 
+            # Create user-specific thread ID
+            base_thread_id = f"{user_id}_{philosopher_id}" if user_id else philosopher_id
             thread_id = (
-                philosopher_id if not new_thread else f"{philosopher_id}-{uuid.uuid4()}"
+                base_thread_id if not new_thread else f"{base_thread_id}_{uuid.uuid4()}"
             )
             config = {
                 "configurable": {"thread_id": thread_id},
@@ -100,6 +103,7 @@ async def get_streaming_response(
     emotional_patterns: Optional[str] = None,
     spiritual_practices: Optional[str] = None,
     life_purpose_patterns: Optional[str] = None,
+    user_id: Optional[str] = None,
     new_thread: bool = False,
 ) -> AsyncGenerator[str, None]:
     """Run a conversation through the workflow graph with streaming response.
@@ -131,8 +135,10 @@ async def get_streaming_response(
             graph = graph_builder.compile(checkpointer=checkpointer)
             opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
 
+            # Create user-specific thread ID
+            base_thread_id = f"{user_id}_{philosopher_id}" if user_id else philosopher_id
             thread_id = (
-                philosopher_id if not new_thread else f"{philosopher_id}-{uuid.uuid4()}"
+                base_thread_id if not new_thread else f"{base_thread_id}_{uuid.uuid4()}"
             )
             config = {
                 "configurable": {"thread_id": thread_id},
