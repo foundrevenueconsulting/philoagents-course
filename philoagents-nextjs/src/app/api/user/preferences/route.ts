@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { UserService } from "@/lib/services/mongodb/userService";
-import { UserPreferences, PreferencesFormData } from "@/types/api";
+import { UserPreferences } from "@/types/api";
 import { FormValidator, TypeSafeConverter } from "@/utils/TypeSafeConverters";
 
 export async function GET() {
@@ -58,9 +58,9 @@ export async function PUT(req: NextRequest) {
     }
     
     if (rawPreferences.conversationSpeed !== undefined) {
-      const speed = TypeSafeConverter.toNumber(rawPreferences.conversationSpeed);
-      if (speed >= 0.5 && speed <= 3.0) {
-        validatedPreferences.conversationSpeed = speed;
+      const speed = TypeSafeConverter.toString(rawPreferences.conversationSpeed);
+      if (['slow', 'normal', 'fast'].includes(speed)) {
+        validatedPreferences.conversationSpeed = speed as 'slow' | 'normal' | 'fast';
       }
     }
     
@@ -100,7 +100,7 @@ export async function PUT(req: NextRequest) {
     await UserService.trackEvent(
       userId,
       "preferences_updated",
-      { updatedFields: Object.keys(filteredPreferences) }
+      { updatedFields: Object.keys(validatedPreferences) }
     );
 
     return NextResponse.json({ preferences: updatedUser.preferences });

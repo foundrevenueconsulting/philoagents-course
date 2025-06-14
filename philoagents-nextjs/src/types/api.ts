@@ -55,7 +55,7 @@ export interface UserProfile {
 export interface UserPreferences {
   favoritePhilosopher?: string;
   gameVolume?: number;
-  conversationSpeed?: number;
+  conversationSpeed?: 'slow' | 'normal' | 'fast';
   theme?: 'light' | 'dark' | 'system';
   language?: string;
   shareConversations?: boolean;
