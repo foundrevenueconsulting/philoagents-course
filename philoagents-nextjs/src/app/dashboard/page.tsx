@@ -60,14 +60,14 @@ export default async function Dashboard() {
           </Link>
 
           <Link
-            href="/dashboard/settings"
+            href="/profile"
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              ⚙️ Settings
+              👤 Profile & Settings
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Customize your experience and manage your preferences.
+              Manage your profile, subscription, and preferences.
             </p>
           </Link>
         </div>
