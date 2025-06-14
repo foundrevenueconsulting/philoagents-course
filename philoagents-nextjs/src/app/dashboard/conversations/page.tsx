@@ -41,7 +41,7 @@ export default async function ConversationsPage() {
 
         <ConversationHistoryClient 
           userId={user?.id} 
-          hasAuth={hasClerkKey}
+          hasAuth={!!hasClerkKey}
         />
       </div>
     </div>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { UserService } from "@/lib/services/mongodb/userService";
+import { UserPreferences, PreferencesFormData } from "@/types/api";
+import { FormValidator, TypeSafeConverter } from "@/utils/TypeSafeConverters";
 
 export async function GET() {
   try {
@@ -36,28 +38,59 @@ export async function PUT(req: NextRequest) {
     }
 
     // Get preferences from request
-    const preferences = await req.json();
+    const rawPreferences = await req.json();
     
-    // Validate preferences (only allow known fields)
-    const allowedFields = [
-      'favoritePhilosopher',
-      'gameVolume',
-      'conversationSpeed',
-      'theme',
-      'language',
-      'shareConversations',
-      'publicProfile'
-    ];
+    // Validate and convert preferences with type safety
+    const validatedPreferences: Partial<UserPreferences> = {};
     
-    const filteredPreferences = Object.keys(preferences)
-      .filter(key => allowedFields.includes(key))
-      .reduce((obj, key) => {
-        obj[key] = preferences[key];
-        return obj;
-      }, {} as any);
+    // Validate each preference field with proper typing
+    if (rawPreferences.favoritePhilosopher !== undefined) {
+      validatedPreferences.favoritePhilosopher = FormValidator.validateOptionalString(
+        rawPreferences.favoritePhilosopher, 50
+      );
+    }
+    
+    if (rawPreferences.gameVolume !== undefined) {
+      const volume = TypeSafeConverter.toNumber(rawPreferences.gameVolume);
+      if (volume >= 0 && volume <= 100) {
+        validatedPreferences.gameVolume = volume;
+      }
+    }
+    
+    if (rawPreferences.conversationSpeed !== undefined) {
+      const speed = TypeSafeConverter.toNumber(rawPreferences.conversationSpeed);
+      if (speed >= 0.5 && speed <= 3.0) {
+        validatedPreferences.conversationSpeed = speed;
+      }
+    }
+    
+    if (rawPreferences.theme !== undefined) {
+      const theme = TypeSafeConverter.toString(rawPreferences.theme);
+      if (['light', 'dark', 'system'].includes(theme)) {
+        validatedPreferences.theme = theme as 'light' | 'dark' | 'system';
+      }
+    }
+    
+    if (rawPreferences.language !== undefined) {
+      validatedPreferences.language = FormValidator.validateOptionalString(
+        rawPreferences.language, 10
+      );
+    }
+    
+    if (rawPreferences.shareConversations !== undefined) {
+      validatedPreferences.shareConversations = TypeSafeConverter.toBoolean(
+        rawPreferences.shareConversations
+      );
+    }
+    
+    if (rawPreferences.publicProfile !== undefined) {
+      validatedPreferences.publicProfile = TypeSafeConverter.toBoolean(
+        rawPreferences.publicProfile
+      );
+    }
 
-    // Update preferences
-    const updatedUser = await UserService.updatePreferences(userId, filteredPreferences);
+    // Update preferences with validated data
+    const updatedUser = await UserService.updatePreferences(userId, validatedPreferences);
 
     if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

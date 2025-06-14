@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
 import { useUser } from '@clerk/nextjs'
-import Phaser from 'phaser'
+import * as Phaser from 'phaser'
 import { Preloader } from '@/lib/phaser/scenes/Preloader'
 import { MainMenu } from '@/lib/phaser/scenes/MainMenu'
 import { Game } from '@/lib/phaser/scenes/Game'

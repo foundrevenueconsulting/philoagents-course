@@ -95,7 +95,7 @@ export default function SettingsClient({ userId }: SettingsClientProps) {
     }
   };
 
-  const handlePreferenceChange = (key: keyof UserPreferences, value: any) => {
+  const handlePreferenceChange = (key: keyof UserPreferences, value: string | number | boolean) => {
     setPreferences(prev => ({ ...prev, [key]: value }));
   };
 
@@ -133,7 +133,7 @@ export default function SettingsClient({ userId }: SettingsClientProps) {
             </label>
             <select
               value={preferences.favoritePhilosopher || ''}
-              onChange={(e) => handlePreferenceChange('favoritePhilosopher', e.target.value || undefined)}
+              onChange={(e) => handlePreferenceChange('favoritePhilosopher', e.target.value || '')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="">No preference</option>

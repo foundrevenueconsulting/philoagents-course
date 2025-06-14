@@ -3,40 +3,34 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { apiService } from '@/lib/services/ApiService';
+import { ConversationHistoryItem } from '@/types/api';
 
-interface Conversation {
-  id: string;
-  philosopher_id: string;
-  philosopher_name: string;
-  message: string;
-  response: string;
-  timestamp: string;
-  user_id?: string;
-}
+// Use the type-safe ConversationHistoryItem from our types
+type Conversation = ConversationHistoryItem;
 
 interface ConversationHistoryClientProps {
   userId?: string;
   hasAuth: boolean;
 }
 
+const philosopherNames = {
+  socrates: 'Socrates',
+  plato: 'Plato',
+  aristotle: 'Aristotle',
+  descartes: 'René Descartes',
+  kant: 'Immanuel Kant',
+  nietzsche: 'Friedrich Nietzsche',
+  wittgenstein: 'Ludwig Wittgenstein',
+  heidegger: 'Martin Heidegger',
+  sartre: 'Jean-Paul Sartre',
+  beauvoir: 'Simone de Beauvoir'
+};
+
 export default function ConversationHistoryClient({ userId, hasAuth }: ConversationHistoryClientProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhilosopher, setSelectedPhilosopher] = useState<string>('all');
-
-  const philosopherNames = {
-    socrates: 'Socrates',
-    plato: 'Plato',
-    aristotle: 'Aristotle',
-    descartes: 'René Descartes',
-    kant: 'Immanuel Kant',
-    nietzsche: 'Friedrich Nietzsche',
-    wittgenstein: 'Ludwig Wittgenstein',
-    heidegger: 'Martin Heidegger',
-    sartre: 'Jean-Paul Sartre',
-    beauvoir: 'Simone de Beauvoir'
-  };
 
   const loadConversations = useCallback(async () => {
     if (!userId) return;
@@ -45,23 +39,17 @@ export default function ConversationHistoryClient({ userId, hasAuth }: Conversat
       setLoading(true);
       setError(null);
       
-      const data = await apiService.getConversationHistory(
+      const conversations = await apiService.getConversationHistory(
         userId, 
         selectedPhilosopher === 'all' ? undefined : selectedPhilosopher
       );
       
-      // Transform the data to match our interface
-      const formattedConversations: Conversation[] = data.map((conv: Record<string, string>) => ({
-        id: conv.id || `${conv.philosopher_id}-${conv.timestamp}`,
-        philosopher_id: conv.philosopher_id,
-        philosopher_name: philosopherNames[conv.philosopher_id as keyof typeof philosopherNames] || conv.philosopher_id,
-        message: conv.message || conv.user_message,
-        response: conv.response || conv.ai_response,
-        timestamp: conv.timestamp,
-        user_id: conv.user_id
+      // Add philosopher display names and sort by timestamp (newest first)
+      const formattedConversations = conversations.map(conv => ({
+        ...conv,
+        philosopher_name: philosopherNames[conv.philosopher_id as keyof typeof philosopherNames] || conv.philosopher_id
       }));
       
-      // Sort by timestamp (newest first)
       formattedConversations.sort((a, b) => 
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );

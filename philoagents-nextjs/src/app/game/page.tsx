@@ -4,14 +4,12 @@ import Link from 'next/link';
 import GameClient from './GameClient';
 
 export default async function GamePage() {
-  let user = null;
-  
   // Only use auth if Clerk keys are configured
   const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
                      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
   
   if (hasClerkKey) {
-    user = await currentUser();
+    await currentUser(); // Load user for auth context, but don't store locally since it's unused
   }
 
   return (
@@ -27,7 +25,7 @@ export default async function GamePage() {
           <h1 className="text-xl font-bold text-white">
             PhiloAgents Game
           </h1>
-          {hasClerkKey && <UserButton afterSignOutUrl="/" />}
+          {hasClerkKey && <UserButton />}
         </div>
       </nav>
 

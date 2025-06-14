@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+// import { headers } from "next/headers"; // Commented out until signature verification is implemented
 import { NextResponse } from "next/server";
 import { UserService } from "@/lib/services/mongodb/userService";
 
