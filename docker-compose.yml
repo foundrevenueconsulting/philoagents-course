@@ -46,26 +46,35 @@ services:
     container_name: philoagents-multiplayer
     build:
       context: ./philoagents-multiplayer
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
     ports:
       - "2567:2567"
     environment:
       - NODE_ENV=development
+      - PORT=2567
+      - CORS_ORIGIN=http://localhost:3000,http://localhost:8080
       - DATABASE_URL=postgresql://philoagents:philoagents@postgres:5432/philoagents_multiplayer
       - ENABLE_MONITOR=true
       - ENABLE_PLAYGROUND=true
       - MAX_PLAYERS_PER_ROOM=10
       - WORLD_WIDTH=1600
       - WORLD_HEIGHT=1200
+      - SPAWN_RADIUS=200
+      - INACTIVE_TIMEOUT_MS=300000
+      - PHILOAGENTS_API_URL=http://api:8000
     volumes:
-      - ./philoagents-multiplayer:/app
-      - /app/node_modules
-      - /app/lib
+      - ./philoagents-multiplayer/src:/app/src
+      - ./philoagents-multiplayer/lib:/app/lib
     depends_on:
       postgres:
         condition: service_started
     networks:
       - philoagents-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2567/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   ui:
     container_name: philoagents-ui

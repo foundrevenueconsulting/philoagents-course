@@ -1,0 +1,42 @@
+# Local Development Dockerfile for Multiplayer Server
+# Optimized for fast rebuilds and hot reload during development
+
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S colyseus && \
+    adduser -S colyseus -u 1001
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (including dev dependencies for development)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build TypeScript for development (with source maps)
+RUN npm run build
+
+# Change ownership to non-root user
+RUN chown -R colyseus:colyseus /app
+
+# Switch to non-root user
+USER colyseus
+
+# Expose port
+EXPOSE 2567
+
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:2567/health || exit 1
+
+# Start server with development settings
+CMD ["npm", "run", "dev"]

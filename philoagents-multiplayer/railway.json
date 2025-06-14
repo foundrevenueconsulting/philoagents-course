@@ -8,7 +8,9 @@
     "numReplicas": 1,
     "sleepApplication": false,
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "restartPolicyMaxRetries": 10,
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300
   },
   "regions": ["us-west1"],
   "environments": {
@@ -21,7 +23,8 @@
         "WORLD_WIDTH": "1600",
         "WORLD_HEIGHT": "1200",
         "SPAWN_RADIUS": "200",
-        "INACTIVE_TIMEOUT_MS": "300000"
+        "INACTIVE_TIMEOUT_MS": "300000",
+        "CORS_ORIGIN": "https://your-frontend-domain.vercel.app,https://your-custom-domain.com"
       }
     },
     "development": {
@@ -33,7 +36,8 @@
         "WORLD_WIDTH": "1600",
         "WORLD_HEIGHT": "1200",
         "SPAWN_RADIUS": "200",
-        "INACTIVE_TIMEOUT_MS": "180000"
+        "INACTIVE_TIMEOUT_MS": "180000",
+        "CORS_ORIGIN": "http://localhost:3000,http://localhost:8080,https://your-preview-domain.vercel.app"
       }
     }
   }

@@ -1,0 +1,92 @@
+# Local Development Docker Compose for Multiplayer Server
+# Usage: docker-compose -f docker-compose.local.yml up
+
+version: '3.8'
+
+services:
+  # PostgreSQL database for multiplayer data
+  postgres-multiplayer:
+    image: postgres:15-alpine
+    container_name: philoagents-postgres-local
+    environment:
+      POSTGRES_DB: philoagents_multiplayer
+      POSTGRES_USER: philoagents
+      POSTGRES_PASSWORD: local_dev_password
+    ports:
+      - "5433:5432"  # Use 5433 to avoid conflicts with main postgres
+    volumes:
+      - multiplayer_postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - multiplayer-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U philoagents -d philoagents_multiplayer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for session storage (optional)
+  redis-multiplayer:
+    image: redis:7-alpine
+    container_name: philoagents-redis-local
+    ports:
+      - "6380:6379"  # Use 6380 to avoid conflicts
+    volumes:
+      - multiplayer_redis_data:/data
+    networks:
+      - multiplayer-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Colyseus multiplayer server
+  multiplayer-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    container_name: philoagents-multiplayer-local
+    environment:
+      NODE_ENV: development
+      PORT: 2567
+      CORS_ORIGIN: "http://localhost:3000,http://localhost:8080"
+      ENABLE_MONITOR: "true"
+      ENABLE_PLAYGROUND: "true"
+      MAX_PLAYERS_PER_ROOM: 10
+      WORLD_WIDTH: 1600
+      WORLD_HEIGHT: 1200
+      SPAWN_RADIUS: 200
+      INACTIVE_TIMEOUT_MS: 300000
+      DATABASE_URL: "postgresql://philoagents:local_dev_password@postgres-multiplayer:5432/philoagents_multiplayer"
+      REDIS_URL: "redis://redis-multiplayer:6379"
+      PHILOAGENTS_API_URL: "http://host.docker.internal:8000"
+    ports:
+      - "2567:2567"
+    depends_on:
+      postgres-multiplayer:
+        condition: service_healthy
+      redis-multiplayer:
+        condition: service_healthy
+    networks:
+      - multiplayer-network
+    volumes:
+      - ./src:/app/src  # Hot reload for development
+      - ./lib:/app/lib
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2567/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  multiplayer_postgres_data:
+    driver: local
+  multiplayer_redis_data:
+    driver: local
+
+networks:
+  multiplayer-network:
+    driver: bridge
+    external: false
