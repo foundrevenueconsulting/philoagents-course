@@ -5,7 +5,7 @@ import { database } from "./database/connection";
 
 async function startServer() {
   try {
-    console.log('🚀 Starting PhiloAgents Multiplayer Server...');
+    // console.log('🚀 Starting PhiloAgents Multiplayer Server...');
     
     // Initialize database connection
     await database.initialize();
@@ -28,13 +28,13 @@ async function startServer() {
     // Start listening
     await gameServer.listen();
     
-    console.log('✅ PhiloAgents Multiplayer Server started successfully!');
-    console.log(`📊 Environment: ${serverConfig.nodeEnv}`);
-    console.log(`🌐 Server: http://localhost:${serverConfig.port}`);
+    // console.log('✅ PhiloAgents Multiplayer Server started successfully!');
+    // console.log(`📊 Environment: ${serverConfig.nodeEnv}`);
+    // console.log(`🌐 Server: http://localhost:${serverConfig.port}`);
     
     if (serverConfig.nodeEnv !== 'production') {
-      console.log(`🔍 Monitor: http://localhost:${serverConfig.port}/colyseus`);
-      console.log(`🎮 Playground: http://localhost:${serverConfig.port}/playground`);
+      // console.log(`🔍 Monitor: http://localhost:${serverConfig.port}/colyseus`);
+      // console.log(`🎮 Playground: http://localhost:${serverConfig.port}/playground`);
     }
     
   } catch (error) {

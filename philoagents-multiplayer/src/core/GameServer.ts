@@ -45,7 +45,7 @@ export class GameServer {
     // API info endpoint
     this.app.get('/api/info', (req, res) => {
       res.json({
-        name: 'PhiloAgents Multiplayer Server',
+        name: 'Great Game of Life Multiplayer Server',
         version: '1.0.0',
         colyseus: "0.15.0", // TODO: Get actual version
         rooms: [], // TODO: Implement room listing
@@ -60,7 +60,7 @@ export class GameServer {
   // Register room types
   public registerRoom(name: string, roomClass: any, options?: any) {
     this.gameServer.define(name, roomClass, options);
-    console.log(`Registered room type: ${name}`);
+    // console.log(`Registered room type: ${name}`);
   }
 
   // Setup development tools
@@ -68,12 +68,12 @@ export class GameServer {
     if (this.config.nodeEnv !== 'production') {
       if (this.config.enableMonitor) {
         this.app.use("/colyseus", monitor());
-        console.log(`Monitor available at: http://localhost:${this.config.port}/colyseus`);
+        // console.log(`Monitor available at: http://localhost:${this.config.port}/colyseus`);
       }
 
       if (this.config.enablePlayground) {
         this.app.use("/playground", playground);
-        console.log(`Playground available at: http://localhost:${this.config.port}/playground`);
+        // console.log(`Playground available at: http://localhost:${this.config.port}/playground`);
       }
     }
   }
@@ -109,18 +109,18 @@ export class GameServer {
   // Graceful shutdown handling
   public setupGracefulShutdown() {
     const gracefulShutdown = async (signal: string) => {
-      console.log(`Received ${signal}. Starting graceful shutdown...`);
+      // console.log(`Received ${signal}. Starting graceful shutdown...`);
       
       try {
         // Stop accepting new connections
         this.server.close(() => {
-          console.log('HTTP server closed');
+          // console.log('HTTP server closed');
         });
 
         // Give existing connections time to finish
         await new Promise(resolve => setTimeout(resolve, 5000));
         
-        console.log('Graceful shutdown completed');
+        // console.log('Graceful shutdown completed');
         process.exit(0);
       } catch (error) {
         console.error('Error during graceful shutdown:', error);
@@ -136,8 +136,8 @@ export class GameServer {
   public async listen(): Promise<void> {
     return new Promise((resolve) => {
       this.gameServer.listen(this.config.port);
-      console.log(`🎮 Colyseus game server listening on port ${this.config.port}`);
-      console.log(`Environment: ${this.config.nodeEnv}`);
+      // console.log(`🎮 Colyseus game server listening on port ${this.config.port}`);
+      // console.log(`Environment: ${this.config.nodeEnv}`);
       resolve();
     });
   }

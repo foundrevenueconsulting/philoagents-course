@@ -65,11 +65,11 @@ export default function PhaserGame({ className = "" }: PhaserGameProps) {
           game.registry.set('apiUrl', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000')
           game.registry.set('multiplayerUrl', process.env.NEXT_PUBLIC_MULTIPLAYER_URL || 'ws://localhost:2567')
           
-          console.log('PhiloAgents Game initialized with user context:', {
-            userId: user?.id || 'anonymous',
-            userName: user?.fullName || 'Anonymous Player',
-            isAuthenticated: !!user
-          })
+          // console.log('Game of Life initialized with user context:', {
+          //   userId: user?.id || 'anonymous',
+          //   userName: user?.fullName || 'Anonymous Player',
+          //   isAuthenticated: !!user
+          // })
         }
       }
     }
@@ -92,7 +92,7 @@ export default function PhaserGame({ className = "" }: PhaserGameProps) {
       <div className={`flex items-center justify-center bg-gray-900 ${className}`}>
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading PhiloAgents...</p>
+          <p>Loading Game of Life...</p>
         </div>
       </div>
     )
@@ -108,7 +108,7 @@ export default function PhaserGame({ className = "" }: PhaserGameProps) {
       
       {/* Game overlay UI (optional) */}
       <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded text-sm">
-        {user ? `Welcome, ${user.firstName}!` : 'Anonymous Player'}
+        {user ? `Welcome, ${user.firstName || user.fullName || 'User'}!` : 'Anonymous Player'}
       </div>
     </div>
   )

@@ -23,7 +23,7 @@ export default async function GamePage() {
             ← Back to Dashboard
           </Link>
           <h1 className="text-xl font-bold text-white">
-            PhiloAgents Game
+            The Great Game of Life
           </h1>
           {hasClerkKey && <UserButton />}
         </div>

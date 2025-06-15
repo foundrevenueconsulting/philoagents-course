@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PhiloAgents - AI Philosophy Game",
+  title: "The Great Game of Life - AI Philosophy Game",
   description: "Engage in philosophical conversations with AI-powered historical philosophers",
 };
 

@@ -26,7 +26,7 @@ export class MultiplayerService {
 
   constructor() {
     this.serverUrl = process.env.NEXT_PUBLIC_MULTIPLAYER_URL || 'ws://localhost:2567';
-    console.log('MultiplayerService initialized with URL:', this.serverUrl);
+    // console.log('MultiplayerService initialized with URL:', this.serverUrl);
   }
 
   setCallbacks(callbacks: GameCallbacks) {
@@ -35,14 +35,14 @@ export class MultiplayerService {
 
   async connect(): Promise<boolean> {
     try {
-      console.log('🔌 Connecting to multiplayer server:', this.serverUrl);
+      // console.log('🔌 Connecting to multiplayer server:', this.serverUrl);
       
       if (typeof this.serverUrl !== 'string') {
         throw new Error(`Invalid server URL type: ${typeof this.serverUrl}`);
       }
       
       this.client = new Client(this.serverUrl);
-      console.log('✅ Multiplayer client created successfully');
+      // console.log('✅ Multiplayer client created successfully');
       return true;
     } catch (error) {
       console.error('❌ Failed to create Colyseus client:', error);
@@ -53,13 +53,13 @@ export class MultiplayerService {
 
   async joinRoom(options: JoinRoomOptions): Promise<boolean> {
     if (!this.client) {
-      console.log('🔗 No client exists, creating new connection...');
+      // console.log('🔗 No client exists, creating new connection...');
       const connected = await this.connect();
       if (!connected) return false;
     }
 
     try {
-      console.log('🚪 Attempting to join philosophy room with options:', options);
+      // console.log('🚪 Attempting to join philosophy room with options:', options);
       
       const roomOptions = {
         playerName: options.playerName,
@@ -71,11 +71,11 @@ export class MultiplayerService {
       this.isConnected = true;
       this.localPlayerId = this.room.sessionId;
 
-      console.log('🎉 Successfully joined room:', {
-        roomId: this.room.roomId,
-        sessionId: this.room.sessionId,
-        playerName: options.playerName
-      });
+      // console.log('🎉 Successfully joined room:', {
+      //   roomId: this.room.roomId,
+      //   sessionId: this.room.sessionId,
+      //   playerName: options.playerName
+      // });
 
       this.setupRoomEventHandlers();
       return true;
@@ -91,13 +91,13 @@ export class MultiplayerService {
 
     // Handle state changes
     this.room.onStateChange((state) => {
-      console.log('📊 Room state changed:', state);
+      // console.log('📊 Room state changed:', state);
       this.gameCallbacks.onStateChange?.(state);
     });
 
     // Handle player join
     this.room.state.players?.onAdd?.((player: Record<string, unknown>, playerId: string) => {
-      console.log('👋 Player joined:', { playerId, playerData: player });
+      // console.log('👋 Player joined:', { playerId, playerData: player });
       
       if (playerId !== this.localPlayerId) {
         this.gameCallbacks.onPlayerJoined?.(playerId, player);
@@ -106,7 +106,7 @@ export class MultiplayerService {
 
     // Handle player leave
     this.room.state.players?.onRemove?.((player: Record<string, unknown>, playerId: string) => {
-      console.log('👋 Player left:', { playerId, playerData: player });
+      // console.log('👋 Player left:', { playerId, playerData: player });
       this.gameCallbacks.onPlayerLeft?.(playerId, player);
     });
 
@@ -119,7 +119,7 @@ export class MultiplayerService {
 
     // Handle custom game events
     this.room.onMessage('gameEvent', (event) => {
-      console.log('🎮 Game event received:', event);
+      // console.log('🎮 Game event received:', event);
       this.gameCallbacks.onGameEvent?.(event);
     });
 
@@ -131,7 +131,7 @@ export class MultiplayerService {
 
     // Handle room leave
     this.room.onLeave((code) => {
-      console.log('🚪 Left room with code:', code);
+      // console.log('🚪 Left room with code:', code);
       this.isConnected = false;
       this.localPlayerId = null;
     });
@@ -169,7 +169,7 @@ export class MultiplayerService {
         timestamp: Date.now()
       });
       
-      console.log('💬 Chat message sent:', { message, messageType });
+      // console.log('💬 Chat message sent:', { message, messageType });
     } catch (error) {
       console.error('❌ Failed to send chat message:', error);
     }
@@ -188,7 +188,7 @@ export class MultiplayerService {
         timestamp: Date.now()
       });
       
-      console.log('🎮 Game event sent:', { eventType, data });
+      // console.log('🎮 Game event sent:', { eventType, data });
     } catch (error) {
       console.error('❌ Failed to send game event:', error);
     }
@@ -197,12 +197,12 @@ export class MultiplayerService {
   async leaveRoom(): Promise<void> {
     if (this.room) {
       try {
-        console.log('🚪 Leaving multiplayer room...');
+        // console.log('🚪 Leaving multiplayer room...');
         await this.room.leave();
         this.room = null;
         this.isConnected = false;
         this.localPlayerId = null;
-        console.log('✅ Successfully left room');
+        // console.log('✅ Successfully left room');
       } catch (error) {
         console.error('❌ Error leaving room:', error);
       }
@@ -213,7 +213,7 @@ export class MultiplayerService {
     this.leaveRoom();
     this.client = null;
     this.gameCallbacks = {};
-    console.log('🔌 Disconnected from multiplayer service');
+    // console.log('🔌 Disconnected from multiplayer service');
   }
 
   private handleError(context: string, error: unknown) {

@@ -51,8 +51,8 @@ export class Preloader extends Scene {
         const isAuthenticated = this.game.registry.get('isAuthenticated');
         const userName = this.game.registry.get('userName');
         
-        console.log('PhiloAgents assets loaded successfully');
-        console.log(`User: ${userName} (${isAuthenticated ? 'authenticated' : 'anonymous'})`);
+        // console.log('PhiloAgents assets loaded successfully');
+        // console.log(`User: ${userName} (${isAuthenticated ? 'authenticated' : 'anonymous'})`);
         
         // Transition to main menu
         this.scene.start('MainMenu');

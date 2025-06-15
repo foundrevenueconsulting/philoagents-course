@@ -18,7 +18,7 @@ export default async function Dashboard() {
       <nav className="bg-white dark:bg-slate-800 shadow">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            PhiloAgents
+            The Great Game of Life
           </h1>
           {hasClerkKey && <UserButton afterSignOutUrl="/" />}
         </div>

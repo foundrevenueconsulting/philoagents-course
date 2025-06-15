@@ -36,12 +36,12 @@ export class Game extends Scene {
         this.userId = this.gameConfig.userId || this.game.registry.get('userId') || 'anonymous';
         this.isAuthenticated = this.gameConfig.isAuthenticated || this.game.registry.get('isAuthenticated') || false;
         
-        console.log('PhiloAgents Game scene initialized:', {
-            multiplayerMode: this.isMultiplayerMode,
-            userName: this.userName,
-            userId: this.userId,
-            isAuthenticated: this.isAuthenticated
-        });
+        // console.log('PhiloAgents Game scene initialized:', {
+        //     multiplayerMode: this.isMultiplayerMode,
+        //     userName: this.userName,
+        //     userId: this.userId,
+        //     isAuthenticated: this.isAuthenticated
+        // });
     }
 
     create() {
@@ -49,7 +49,7 @@ export class Game extends Scene {
         this.createWorld();
         this.createPlayer();
         this.createPhilosophers();
-        this.createUI();
+        // this.createUI();
         this.setupControls();
         this.setupConversationSystem();
         this.setupMultiplayer();
@@ -67,8 +67,8 @@ export class Game extends Scene {
                 return;
             }
             
-            console.log('Tilemap loaded successfully. Dimensions:', map.widthInPixels, 'x', map.heightInPixels);
-            console.log('Available layers:', map.layers.map(layer => layer.name));
+            // console.log('Tilemap loaded successfully. Dimensions:', map.widthInPixels, 'x', map.heightInPixels);
+            // console.log('Available layers:', map.layers.map(layer => layer.name));
             
             // Add tilesets - matching the original implementation
             const tuxmonTileset = map.addTilesetImage('tuxmon-sample-32px-extruded', 'tuxmon-tiles');
@@ -83,7 +83,7 @@ export class Game extends Scene {
                 return;
             }
             
-            console.log('Loaded tilesets:', tilesets.length);
+            // console.log('Loaded tilesets:', tilesets.length);
 
             // Create layers in the proper order (matching original)
             const belowLayer = map.createLayer('Below Player', tilesets, 0, 0);
@@ -93,25 +93,25 @@ export class Game extends Scene {
             // Configure layers
             if (worldLayer) {
                 worldLayer.setCollisionByProperty({ collides: true });
-                console.log('World layer collision set');
+                // console.log('World layer collision set');
             }
             
             if (aboveLayer) {
                 aboveLayer.setDepth(10);
-                console.log('Above layer depth set to 10');
+                // console.log('Above layer depth set to 10');
             }
             
-            console.log('Created layers:', {
-                belowLayer: !!belowLayer,
-                worldLayer: !!worldLayer,
-                aboveLayer: !!aboveLayer
-            });
+            // console.log('Created layers:', {
+            //     belowLayer: !!belowLayer,
+            //     worldLayer: !!worldLayer,
+            //     aboveLayer: !!aboveLayer
+            // });
             
             // Set world bounds
             if (map.widthInPixels && map.heightInPixels) {
                 this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
                 this.physics.world.setBoundsCollision(true, true, true, true);
-                console.log('Set world bounds:', map.widthInPixels, 'x', map.heightInPixels);
+                // console.log('Set world bounds:', map.widthInPixels, 'x', map.heightInPixels);
             } else {
                 // Fallback world size
                 this.physics.world.setBounds(0, 0, 1600, 1200);
@@ -129,24 +129,24 @@ export class Game extends Scene {
     }
 
     private createFallbackWorld() {
-        console.log('Creating fallback world');
+        // console.log('Creating fallback world');
         
         // Create a simple colored background
         const bg = this.add.rectangle(800, 600, 1600, 1200, 0x4a90e2);
         bg.setOrigin(0.5);
         
         // Add some visual elements to make it clear this is the game world
-        this.add.text(800, 100, 'PhiloAgents World', {
-            fontSize: '48px',
-            color: '#ffffff',
-            fontFamily: 'Arial, sans-serif'
-        }).setOrigin(0.5);
+        // this.add.text(800, 100, 'PhiloAgents World', {
+        //     fontSize: '48px',
+        //     color: '#ffffff',
+        //     fontFamily: 'Arial, sans-serif'
+        // }).setOrigin(0.5);
         
-        this.add.text(800, 150, 'Walk around and talk to philosophers!', {
-            fontSize: '24px',
-            color: '#ffffff',
-            fontFamily: 'Arial, sans-serif'
-        }).setOrigin(0.5);
+        // this.add.text(800, 150, 'Walk around and talk to philosophers!', {
+        //     fontSize: '24px',
+        //     color: '#ffffff',
+        //     fontFamily: 'Arial, sans-serif'
+        // }).setOrigin(0.5);
         
         // Set world bounds for fallback
         this.physics.world.setBounds(0, 0, 1600, 1200);
@@ -157,7 +157,7 @@ export class Game extends Scene {
         const spawnX = 800; // Center of world
         const spawnY = 600;
         
-        console.log('Attempting to create player at:', spawnX, spawnY);
+        // console.log('Attempting to create player at:', spawnX, spawnY);
         
         // Try to create Sophia player first
         if (this.textures.exists('sophia')) {
@@ -169,7 +169,7 @@ export class Game extends Scene {
     }
 
     private createFallbackPlayer(x: number, y: number) {
-        console.log('Creating fallback player at:', x, y);
+        // console.log('Creating fallback player at:', x, y);
         
         // Create a magenta rectangle using Graphics
         const graphics = this.add.graphics();
@@ -187,7 +187,7 @@ export class Game extends Scene {
         this.player.setDisplaySize(50, 50);
         this.player.setDepth(300);
         
-        console.log('Physics sprite player created at:', this.player.x, this.player.y, 'depth:', this.player.depth);
+        // console.log('Physics sprite player created at:', this.player.x, this.player.y, 'depth:', this.player.depth);
         
         // Now we can safely add physics properties
         if (this.player.body) {
@@ -220,11 +220,11 @@ export class Game extends Scene {
         }
         
         
-        console.log('Player creation complete. Player type:', typeof this.player, 'Position:', this.player.x, this.player.y);
+        // console.log('Player creation complete. Player type:', typeof this.player, 'Position:', this.player.x, this.player.y);
     }
 
     private createSophiaPlayer(x: number, y: number) {
-        console.log('Creating Sophia player at:', x, y);
+        // console.log('Creating Sophia player at:', x, y);
         
         try {
             // Check if Sophia texture and frames are available
@@ -237,7 +237,7 @@ export class Game extends Scene {
 
             // Get available frames
             const frameNames = texture.getFrameNames();
-            console.log('Available Sophia frames:', frameNames);
+            // console.log('Available Sophia frames:', frameNames);
 
             // Try to find an idle front frame
             let frameKey = 'sophia_idle_front.png';
@@ -250,7 +250,7 @@ export class Game extends Scene {
                 ) || frameNames[0];
             }
 
-            console.log('Using frame:', frameKey);
+            // console.log('Using frame:', frameKey);
 
             // Create Sophia sprite
             this.player = this.physics.add.sprite(x, y, 'sophia', frameKey);
@@ -284,7 +284,7 @@ export class Game extends Scene {
             // Create player animations
             this.createPlayerAnimations();
 
-            console.log('Sophia player created successfully at:', this.player.x, this.player.y);
+            // console.log('Sophia player created successfully at:', this.player.x, this.player.y);
 
         } catch (error) {
             console.error('Error creating Sophia player:', error);
@@ -378,22 +378,22 @@ export class Game extends Scene {
             { id: "searle", name: `${biotypeEmojis[philosopherBiotypes["searle"]]} Searle`, spawnName: "Searle", defaultDirection: "front", roamRadius: 730 },
             { id: "chomsky", name: `${biotypeEmojis[philosopherBiotypes["chomsky"]]} Chomsky`, spawnName: "Chomsky", defaultDirection: "front", roamRadius: 690 },
             { id: "dennett", name: `${biotypeEmojis[philosopherBiotypes["dennett"]]} Dennett`, spawnName: "Dennett", defaultDirection: "front", roamRadius: 710 },
-            { 
-                id: "miguel", 
-                name: "Miguel", 
-                spawnName: "Miguel",
-                defaultDirection: "front", 
-                roamRadius: 300,
-                defaultMessage: "Hey there! I'm Miguel, but you can call me Mr Agent. I'd love to chat, but I'm currently writing my Substack article for tomorrow. If you're curious about my work, take a look at The Neural Maze!" 
-            },
-            { 
-                id: "paul", 
-                name: "Paul", 
-                spawnName: "Paul",
-                defaultDirection: "front",
-                roamRadius: 300,
-                defaultMessage: "Hey, I'm busy teaching my cat AI with my latest course. I can't talk right now. Check out Decoding ML for more on my thoughts." 
-            }
+            // { 
+            //     id: "miguel", 
+            //     name: "Miguel", 
+            //     spawnName: "Miguel",
+            //     defaultDirection: "front", 
+            //     roamRadius: 300,
+            //     defaultMessage: "Hey there! I'm Miguel, but you can call me Mr Agent. I'd love to chat, but I'm currently writing my Substack article for tomorrow. If you're curious about my work, take a look at The Neural Maze!" 
+            // },
+            // { 
+            //     id: "paul", 
+            //     name: "Paul", 
+            //     spawnName: "Paul",
+            //     defaultDirection: "front",
+            //     roamRadius: 300,
+            //     defaultMessage: "Hey, I'm busy teaching my cat AI with my latest course. I can't talk right now. Check out Decoding ML for more on my thoughts." 
+            // }
         ];
 
         this.philosophers = [];
@@ -435,7 +435,7 @@ export class Game extends Scene {
             });
         }
 
-        console.log(`Created ${this.philosophers.length} philosophers`);
+        // console.log(`Created ${this.philosophers.length} philosophers`);
     }
 
     private createPhilosopherFromConfig(config: {
@@ -468,53 +468,53 @@ export class Game extends Scene {
         });
         
         this.philosophers.push(character);
-        console.log(`Created philosopher: ${config.name} at (${spawnPoint.x}, ${spawnPoint.y})`);
+        // console.log(`Created philosopher: ${config.name} at (${spawnPoint.x}, ${spawnPoint.y})`);
     }
 
 
-    private createUI() {
-        // Create UI elements
-        const uiText = this.add.text(16, 16, '', {
-            fontSize: '16px',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { x: 8, y: 4 }
-        });
-        uiText.setScrollFactor(0);
-        uiText.setDepth(100);
-        uiText.setName('uiText');
+    // private createUI() {
+    //     // Create UI elements
+    //     const uiText = this.add.text(16, 16, '', {
+    //         fontSize: '16px',
+    //         color: '#ffffff',
+    //         backgroundColor: '#000000',
+    //         padding: { x: 8, y: 4 }
+    //     });
+    //     uiText.setScrollFactor(0);
+    //     uiText.setDepth(100);
+    //     uiText.setName('uiText');
 
-        this.updateUI();
-    }
+    //     this.updateUI();
+    // }
 
-    private updateUI() {
-        const uiText = this.children.getByName('uiText') as Phaser.GameObjects.Text;
-        if (uiText) {
-            let playerInfo = 'Not created';
-            if (this.player) {
-                playerInfo = [
-                    `Pos: (${Math.round(this.player.x)}, ${Math.round(this.player.y)})`,
-                    `Visible: ${this.player.visible}`,
-                    `Depth: ${this.player.depth}`,
-                    `Active: ${this.player.active}`
-                ].join(' | ');
-            }
+    // private updateUI() {
+    //     const uiText = this.children.getByName('uiText') as Phaser.GameObjects.Text;
+    //     if (uiText) {
+    //         let playerInfo = 'Not created';
+    //         if (this.player) {
+    //             playerInfo = [
+    //                 `Pos: (${Math.round(this.player.x)}, ${Math.round(this.player.y)})`,
+    //                 `Visible: ${this.player.visible}`,
+    //                 `Depth: ${this.player.depth}`,
+    //                 `Active: ${this.player.active}`
+    //             ].join(' | ');
+    //         }
             
-            uiText.setText([
-                `Player: ${this.userName}`,
-                `Player Info: ${playerInfo}`,
-                `Mode: ${this.isMultiplayerMode ? 'Multiplayer' : 'Single Player'}`,
-                `Auth: ${this.isAuthenticated ? 'Yes' : 'Guest'}`,
-                '',
-                'Controls:',
-                'Arrow Keys - Move',
-                'SPACE - Interact with philosophers',
-                'ESC - Pause Menu',
-                '',
-                'Walk around and meet the philosophers!'
-            ]);
-        }
-    }
+    //         uiText.setText([
+    //             `Player: ${this.userName}`,
+    //             `Player Info: ${playerInfo}`,
+    //             `Mode: ${this.isMultiplayerMode ? 'Multiplayer' : 'Single Player'}`,
+    //             `Auth: ${this.isAuthenticated ? 'Yes' : 'Guest'}`,
+    //             '',
+    //             'Controls:',
+    //             'Arrow Keys - Move',
+    //             'SPACE - Interact with philosophers',
+    //             'ESC - Pause Menu',
+    //             '',
+    //             'Walk around and meet the philosophers!'
+    //         ]);
+    //     }
+    // }
 
     private setupControls() {
         // Create cursor keys
@@ -527,22 +527,22 @@ export class Game extends Scene {
 
     private setupConversationSystem() {
         this.conversationSystem = new ConversationSystem(this);
-        console.log('Conversation system initialized');
+        // console.log('Conversation system initialized');
     }
 
     private async setupMultiplayer() {
         if (this.isMultiplayerMode) {
-            console.log('Setting up multiplayer connection...');
+            // console.log('Setting up multiplayer connection...');
             this.showMultiplayerStatus('Connecting to multiplayer server...');
             
             // Setup multiplayer callbacks
             multiplayerService.setCallbacks({
                 onPlayerJoined: (playerId, playerData) => {
-                    console.log('Remote player joined:', playerId, playerData);
+                    // console.log('Remote player joined:', playerId, playerData);
                     this.showMultiplayerStatus(`${playerData.name || 'Player'} joined the room`);
                 },
                 onPlayerLeft: (playerId, playerData) => {
-                    console.log('Remote player left:', playerId, playerData);
+                    // console.log('Remote player left:', playerId, playerData);
                     this.showMultiplayerStatus(`${playerData.name || 'Player'} left the room`);
                 },
                 onError: (error) => {
@@ -588,7 +588,7 @@ export class Game extends Scene {
         // Find nearby philosophers
         const nearbyPhilosopher = this.findNearbyPhilosopher();
         if (nearbyPhilosopher) {
-            console.log(`Interacting with ${nearbyPhilosopher.name}`);
+            // console.log(`Interacting with ${nearbyPhilosopher.name}`);
             this.startConversation(nearbyPhilosopher);
         }
     }
@@ -740,6 +740,6 @@ export class Game extends Scene {
         }
 
         // Update UI every frame to show current player position
-        this.updateUI();
+        // this.updateUI();
     }
 }

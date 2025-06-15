@@ -15,7 +15,7 @@ const planConfig = {
     name: 'Free',
     icon: Star,
     color: 'bg-gray-100 text-gray-800',
-    description: 'Basic access to PhiloAgents',
+    description: 'Basic access to The Great Game of Life',
   },
   pro: {
     name: 'Pro',
