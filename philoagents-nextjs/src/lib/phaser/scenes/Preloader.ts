@@ -48,7 +48,9 @@ export class Preloader extends Scene {
 
     create() {
         // Get user context from game registry
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const isAuthenticated = this.game.registry.get('isAuthenticated');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const userName = this.game.registry.get('userName');
         
         // console.log('PhiloAgents assets loaded successfully');

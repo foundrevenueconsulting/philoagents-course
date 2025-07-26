@@ -86,6 +86,7 @@ export class Game extends Scene {
             // console.log('Loaded tilesets:', tilesets.length);
 
             // Create layers in the proper order (matching original)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const belowLayer = map.createLayer('Below Player', tilesets, 0, 0);
             const worldLayer = map.createLayer('World', tilesets, 0, 0);
             const aboveLayer = map.createLayer('Above Player', tilesets, 0, 0);

@@ -130,6 +130,7 @@ export class MultiplayerService {
     });
 
     // Handle room leave
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.room.onLeave((code) => {
       // console.log('🚪 Left room with code:', code);
       this.isConnected = false;
