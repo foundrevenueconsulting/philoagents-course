@@ -34,7 +34,7 @@ class AgentConfig(BaseModel):
         default=[], description="List of personality traits"
     )
     system_prompt: str = Field(description="System prompt defining agent behavior")
-    model: str = Field(default="mixtral-8x7b-32768", description="LLM model to use")
+    model: str = Field(default="llama-3.3-70b-versatile", description="LLM model to use")
     
     # Visual configuration for UI
     primary_color: str = Field(description="Primary color for agent's visual theme")

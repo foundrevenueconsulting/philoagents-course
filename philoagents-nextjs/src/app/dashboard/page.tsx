@@ -34,7 +34,7 @@ export default async function Dashboard() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link
             href="/game"
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
@@ -45,6 +45,21 @@ export default async function Dashboard() {
             <p className="text-gray-600 dark:text-gray-300">
               Join the interactive philosophy world and chat with AI philosophers.
             </p>
+          </Link>
+
+          <Link
+            href="/discussions"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700 ring-2 ring-blue-500/20"
+          >
+            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+              🗣️ Multi-Way Discussions
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Watch AI agents debate and collaborate in real-time conversations.
+            </p>
+            <div className="mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+              NEW FEATURE
+            </div>
           </Link>
 
           <Link
