@@ -127,3 +127,87 @@ export function isPlayerData(data: unknown): data is PlayerData {
          'x' in data &&
          'y' in data;
 }
+
+// Multi-way conversation types
+export interface AgentConfig {
+  id: string;
+  name: string;
+  role: 'lead' | 'contributor' | 'skeptic' | 'moderator';
+  domain_expertise: string;
+  primary_color: string;
+  secondary_color: string;
+}
+
+export interface ConversationConfig {
+  id: string;
+  name: string;
+  description: string;
+  format: string;
+  agents: AgentConfig[];
+  max_rounds: number;
+  allow_human_feedback: boolean;
+}
+
+export interface Message {
+  id: string;
+  role: 'user' | 'agent' | 'system';
+  content: string;
+  agent_id?: string;
+  agent_name?: string;
+  timestamp: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface DialogueState {
+  session_id: string;
+  config_id: string;
+  status: 'waiting_for_topic' | 'in_progress' | 'waiting_for_user' | 'completed' | 'error';
+  topic?: string;
+  messages: Message[];
+  turn_info: {
+    current_agent_id?: string;
+    next_agent_id?: string;
+    turn_number: number;
+    reasoning?: string;
+  };
+  active_agents: string[];
+  agent_contexts: Record<string, Array<{ role: string; content: string }>>;
+  created_at: string;
+  updated_at: string;
+  round_count: number;
+  waiting_for_user_feedback: boolean;
+  user_feedback_prompt?: string;
+  current_subtopic?: string;
+  key_points: string[];
+  decisions_made: string[];
+}
+
+export interface MultiWayConversationResponse {
+  session_id: string;
+  status: string;
+  message?: string;
+  dialogue_state?: DialogueState;
+}
+
+export interface StartConversationRequest {
+  config_id: string;
+  session_id?: string;
+}
+
+export interface ConversationMessageRequest {
+  session_id: string;
+  message: string;
+}
+
+export interface StreamEvent {
+  type: 'speaker_info' | 'agent_response' | 'user_input_requested' | 'turn_complete' | 'system' | 'error';
+  agent_id?: string;
+  agent_name?: string;
+  agent_role?: string;
+  content?: string;
+  message_id?: string;
+  questions?: string[];
+  next_speaker_id?: string;
+  message?: string;
+  dialogue_state?: DialogueState;
+}
