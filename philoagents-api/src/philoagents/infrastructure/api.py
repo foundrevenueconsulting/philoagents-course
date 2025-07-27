@@ -15,8 +15,10 @@ from philoagents.application.conversation_service.generate_response import (
 from philoagents.application.conversation_service.reset_conversation import (
     reset_conversation_state,
 )
+from philoagents.application.multi_way_conversation.conversation_orchestrator import (
+    ConversationOrchestrator,
+)
 from philoagents.domain.philosopher_factory import PhilosopherFactory
-from philoagents.infrastructure.mongo.client import MongoClientWrapper
 from philoagents.config import settings
 
 from .opik_utils import configure
@@ -44,6 +46,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Global conversation orchestrator instance
+conversation_orchestrator = ConversationOrchestrator()
+
 
 class ChatMessage(BaseModel):
     message: str
@@ -55,6 +60,214 @@ class ResetMemoryRequest(BaseModel):
     user_id: Optional[str] = None
 
 
+# Multi-way conversation models
+class StartConversationRequest(BaseModel):
+    config_id: str
+    session_id: Optional[str] = None
+
+
+class ConversationMessageRequest(BaseModel):
+    session_id: str
+    message: str
+
+
+class ConversationResponse(BaseModel):
+    session_id: str
+    status: str
+    message: Optional[str] = None
+    dialogue_state: Optional[dict] = None
+
+
+# Multi-way conversation endpoints
+@app.get("/multi-way/configurations")
+async def get_configurations():
+    """Get all available conversation configurations"""
+    try:
+        configs = conversation_orchestrator.get_available_configurations()
+        return {
+            "configurations": {
+                config_id: {
+                    "id": config.id,
+                    "name": config.name,
+                    "description": config.description,
+                    "format": config.format.value,
+                    "agents": [
+                        {
+                            "id": agent.id,
+                            "name": agent.name,
+                            "role": agent.role.value,
+                            "domain_expertise": agent.domain_expertise,
+                            "primary_color": agent.primary_color,
+                            "secondary_color": agent.secondary_color,
+                        }
+                        for agent in config.agents
+                    ],
+                    "max_rounds": config.max_rounds,
+                    "allow_human_feedback": config.allow_human_feedback,
+                }
+                for config_id, config in configs.items()
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/multi-way/start")
+async def start_conversation(request: StartConversationRequest):
+    """Start a new multi-way conversation"""
+    try:
+        session_id, dialogue_state = await conversation_orchestrator.start_conversation(
+            config_id=request.config_id,
+            session_id=request.session_id
+        )
+        
+        return ConversationResponse(
+            session_id=session_id,
+            status=dialogue_state.status.value,
+            message="Conversation started. Please provide a topic to discuss.",
+            dialogue_state=dialogue_state.dict()
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/multi-way/message")
+async def send_message(request: ConversationMessageRequest):
+    """Send a message to the multi-way conversation"""
+    try:
+        dialogue_state = await conversation_orchestrator.process_user_message(
+            session_id=request.session_id,
+            message=request.message
+        )
+        
+        return ConversationResponse(
+            session_id=request.session_id,
+            status=dialogue_state.status.value,
+            message="Message processed successfully",
+            dialogue_state=dialogue_state.dict()
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/multi-way/{session_id}/stream")
+async def stream_conversation(session_id: str):
+    """Stream the next agent response in the conversation"""
+    try:
+        async def generate_stream():
+            try:
+                async for event in conversation_orchestrator.generate_next_response(session_id):
+                    if event["type"] == "error":
+                        yield f"event: error\ndata: {event['message']}\n\n"
+                    elif event["type"] == "speaker_info":
+                        yield f"event: speaker\ndata: {event['agent_name']} ({event['agent_role']})\n\n"
+                    elif event["type"] == "agent_response":
+                        # Stream the response content
+                        yield f"event: response_start\ndata: {event['agent_name']}\n\n"
+                        
+                        # Simulate streaming chunks (in real implementation, you might want actual streaming)
+                        content = event["content"]
+                        chunk_size = 20
+                        for i in range(0, len(content), chunk_size):
+                            chunk = content[i:i + chunk_size]
+                            yield f"event: chunk\ndata: {chunk}\n\n"
+                        
+                        yield "event: response_end\ndata: complete\n\n"
+                    elif event["type"] == "user_input_requested":
+                        yield f"event: user_input\ndata: {'; '.join(event['questions'])}\n\n"
+                    elif event["type"] == "turn_complete":
+                        next_speaker = event.get("next_speaker_id", "")
+                        yield f"event: turn_complete\ndata: {next_speaker}\n\n"
+                    elif event["type"] == "system":
+                        yield f"event: system\ndata: {event['message']}\n\n"
+                
+                yield "event: done\ndata: stream_complete\n\n"
+                
+            except Exception as e:
+                yield f"event: error\ndata: {str(e)}\n\n"
+
+        return StreamingResponse(
+            generate_stream(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/multi-way/{session_id}")
+async def get_conversation_state(session_id: str):
+    """Get current conversation state"""
+    try:
+        dialogue_state = conversation_orchestrator.get_conversation_state(session_id)
+        if not dialogue_state:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        return {
+            "session_id": session_id,
+            "dialogue_state": dialogue_state.dict()
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/multi-way/{session_id}/history")
+async def get_conversation_history(session_id: str, limit: Optional[int] = None):
+    """Get conversation history"""
+    try:
+        messages = conversation_orchestrator.get_conversation_history(session_id, limit)
+        return {
+            "session_id": session_id,
+            "messages": [msg.dict() for msg in messages]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/multi-way/{session_id}")
+async def end_conversation(session_id: str):
+    """End a multi-way conversation"""
+    try:
+        dialogue_state = await conversation_orchestrator.end_conversation(session_id)
+        if not dialogue_state:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        return ConversationResponse(
+            session_id=session_id,
+            status=dialogue_state.status.value,
+            message="Conversation ended successfully"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/multi-way/{session_id}/summary")
+async def get_conversation_summary(session_id: str):
+    """Get conversation summary from all agents' perspectives"""
+    try:
+        summaries = await conversation_orchestrator.get_conversation_summary(session_id)
+        return {
+            "session_id": session_id,
+            "summaries": summaries
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Original single-philosopher endpoints
 @app.post("/chat")
 async def chat(chat_message: ChatMessage):
     try:
@@ -214,7 +427,6 @@ async def get_user_conversations(user_id: str, philosopher_id: Optional[str] = N
     """
     try:
         from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver
-        from langchain_core.messages import HumanMessage, AIMessage
         
         # Use LangGraph's checkpointer to properly retrieve conversation history
         async with AsyncMongoDBSaver.from_conn_string(
@@ -293,7 +505,7 @@ async def get_user_conversations(user_id: str, philosopher_id: Optional[str] = N
                                 try:
                                     philosopher = philosopher_factory.get_philosopher(extracted_philosopher_id)
                                     philosopher_name = philosopher.name
-                                except:
+                                except Exception:
                                     philosopher_name = extracted_philosopher_id.title()
                                 
                                 # Get timestamp from checkpoint
@@ -317,7 +529,7 @@ async def get_user_conversations(user_id: str, philosopher_id: Optional[str] = N
                                 
                                 conversations.append(conversation)
                                 
-                except Exception as e:
+                except Exception:
                     continue
             
             client.close()
