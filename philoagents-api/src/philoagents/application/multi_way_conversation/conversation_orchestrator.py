@@ -5,10 +5,20 @@ import uuid
 from typing import Dict, List, Optional, AsyncGenerator, Tuple
 import logging
 
+try:
+    import opik
+    OPIK_AVAILABLE = True
+except ImportError:
+    OPIK_AVAILABLE = False
+
 from philoagents.domain.multi_way.conversation_config import ConversationConfig, PREDEFINED_CONFIGURATIONS
 from philoagents.domain.multi_way.dialogue_state import (
     DialogueState, ConversationStatus, MessageRole, Message
 )
+from philoagents.domain.multi_way.conversation_persistence import (
+    PersistedConversation, ConversationSummary, ConversationListFilter, ConversationMetadata
+)
+from philoagents.infrastructure.mongo.multi_way_repository import MultiWayConversationRepository
 from .persona_manager import PersonaManager
 
 logger = logging.getLogger(__name__)
@@ -22,6 +32,7 @@ class ConversationOrchestrator:
     def __init__(self):
         self.active_sessions: Dict[str, DialogueState] = {}
         self.persona_managers: Dict[str, PersonaManager] = {}
+        self.repository = MultiWayConversationRepository()
     
     def get_available_configurations(self) -> Dict[str, ConversationConfig]:
         """Get all available conversation configurations"""
@@ -66,6 +77,16 @@ class ConversationOrchestrator:
         self.active_sessions[session_id] = dialogue_state
         self.persona_managers[session_id] = persona_manager
         
+        # Persist to database
+        try:
+            self.repository.save_conversation(
+                session_id=session_id,
+                dialogue_state=dialogue_state,
+                config=config
+            )
+        except Exception as e:
+            logger.warning(f"Failed to persist conversation {session_id}: {e}")
+        
         logger.info(f"Started conversation session {session_id} with config {config_id}")
         return session_id, dialogue_state
     
@@ -83,6 +104,12 @@ class ConversationOrchestrator:
         
         # Set topic in dialogue state
         dialogue_state.set_topic(topic)
+        
+        # Update in database
+        try:
+            self._persist_dialogue_state(session_id, dialogue_state)
+        except Exception as e:
+            logger.warning(f"Failed to persist topic update for {session_id}: {e}")
         
         # Generate introduction from lead agent
         try:
@@ -140,12 +167,19 @@ class ConversationOrchestrator:
         if dialogue_state.waiting_for_user_feedback:
             dialogue_state.clear_user_wait()
         
+        # Persist changes
+        try:
+            self._persist_dialogue_state(session_id, dialogue_state)
+        except Exception as e:
+            logger.warning(f"Failed to persist user message for {session_id}: {e}")
+        
         # If this is a topic setting message and we're waiting for topic
         if dialogue_state.status == ConversationStatus.WAITING_FOR_TOPIC:
             return await self.set_topic(session_id, message)
         
         return dialogue_state
     
+    @opik.track if OPIK_AVAILABLE else lambda f: f
     async def generate_next_response(self, session_id: str) -> AsyncGenerator[Dict, None]:
         """
         Generate the next agent response in the conversation
@@ -167,9 +201,22 @@ class ConversationOrchestrator:
             }
             return
         
-        # Check round limit
+        # Check round limit with better logging
         if dialogue_state.round_count >= persona_manager.config.max_rounds:
             dialogue_state.end_conversation()
+            if OPIK_AVAILABLE:
+                try:
+                    client = opik.Opik()
+                    client.log_traces([{
+                        "name": "conversation_ended",
+                        "output": {
+                            "reason": "max_rounds_reached",
+                            "round_count": dialogue_state.round_count,
+                            "message_count": len(dialogue_state.messages)
+                        }
+                    }])
+                except Exception:
+                    pass
             yield {
                 "type": "system",
                 "message": "Conversation has reached maximum rounds limit",
@@ -281,6 +328,12 @@ class ConversationOrchestrator:
                 
                 dialogue_state.complete_round()
                 
+                # Persist after completing round
+                try:
+                    self._persist_dialogue_state(session_id, dialogue_state)
+                except Exception as e:
+                    logger.warning(f"Failed to persist round completion for {session_id}: {e}")
+                
                 yield {
                     "type": "turn_complete",
                     "next_speaker_id": next_speaker_id,
@@ -339,3 +392,48 @@ class ConversationOrchestrator:
             return {}
         
         return persona_manager.get_conversation_summary(dialogue_state)
+    
+    def _persist_dialogue_state(self, session_id: str, dialogue_state: DialogueState) -> None:
+        """Helper method to persist dialogue state to database"""
+        persona_manager = self.persona_managers.get(session_id)
+        if not persona_manager:
+            return
+        
+        self.repository.save_conversation(
+            session_id=session_id,
+            dialogue_state=dialogue_state,
+            config=persona_manager.config
+        )
+    
+    async def load_conversation(self, session_id: str) -> Optional[DialogueState]:
+        """Load a conversation from the database"""
+        try:
+            persisted = self.repository.get_conversation_by_session_id(session_id)
+            if not persisted:
+                return None
+            
+            # Restore to active sessions if not already there
+            if session_id not in self.active_sessions:
+                config = self.get_configuration(persisted.dialogue_state.config_id)
+                if config:
+                    persona_manager = PersonaManager(config)
+                    self.active_sessions[session_id] = persisted.dialogue_state
+                    self.persona_managers[session_id] = persona_manager
+                    logger.info(f"Loaded conversation {session_id} from database")
+            
+            return persisted.dialogue_state
+            
+        except Exception as e:
+            logger.error(f"Failed to load conversation {session_id}: {e}")
+            return None
+    
+    async def list_conversations(
+        self,
+        filter_params: ConversationListFilter
+    ) -> List[ConversationSummary]:
+        """List conversations with filtering and pagination"""
+        return self.repository.list_conversations(filter_params)
+    
+    async def get_persisted_conversation(self, session_id: str) -> Optional[PersistedConversation]:
+        """Get the full persisted conversation"""
+        return self.repository.get_conversation_by_session_id(session_id)

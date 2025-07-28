@@ -267,6 +267,75 @@ async def get_conversation_summary(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/test-conversations")
+async def list_conversations(
+    config_id: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0,
+    sort_by: str = "updated_at",
+    sort_order: str = "desc"
+):
+    """List multi-way conversations with filtering and pagination"""
+    try:
+        from philoagents.domain.multi_way.conversation_persistence import ConversationListFilter
+        from philoagents.domain.multi_way.dialogue_state import ConversationStatus
+        
+        # Parse status if provided
+        parsed_status = None
+        if status:
+            try:
+                parsed_status = ConversationStatus(status)
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
+        
+        filter_params = ConversationListFilter(
+            config_id=config_id,
+            status=parsed_status,
+            limit=min(limit, 100),  # Cap at 100
+            offset=max(offset, 0),  # No negative offsets
+            sort_by=sort_by,
+            sort_order=sort_order
+        )
+        
+        conversations = await conversation_orchestrator.list_conversations(filter_params)
+        
+        return {
+            "conversations": [conv.model_dump() for conv in conversations],
+            "filter": filter_params.model_dump(),
+            "count": len(conversations)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/multi-way/load/{session_id}")
+async def load_conversation(session_id: str):
+    """Load a conversation from database (useful for resuming)"""
+    try:
+        # Try to load from database
+        dialogue_state = await conversation_orchestrator.load_conversation(session_id)
+        
+        if not dialogue_state:
+            raise HTTPException(status_code=404, detail=f"Conversation {session_id} not found")
+        
+        # Get the full persisted conversation for metadata
+        persisted = await conversation_orchestrator.get_persisted_conversation(session_id)
+        
+        return {
+            "session_id": session_id,
+            "dialogue_state": dialogue_state.model_dump(),
+            "metadata": persisted.metadata.model_dump() if persisted else None,
+            "status": "loaded"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Original single-philosopher endpoints
 @app.post("/chat")
 async def chat(chat_message: ChatMessage):

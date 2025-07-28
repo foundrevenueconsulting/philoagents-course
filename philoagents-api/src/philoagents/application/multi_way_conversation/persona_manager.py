@@ -4,6 +4,12 @@ Manager for handling multiple agent personas in conversations
 from typing import Dict, List, Optional
 import logging
 
+try:
+    import opik
+    OPIK_AVAILABLE = True
+except ImportError:
+    OPIK_AVAILABLE = False
+
 from philoagents.domain.multi_way.conversation_config import ConversationConfig, AgentConfig, AgentRole
 from philoagents.domain.multi_way.dialogue_state import DialogueState
 from .configurable_agent import ConfigurableAgent
@@ -106,6 +112,7 @@ Maximum rounds: {self.config.max_rounds}
             logger.error(f"Failed to generate introduction: {e}")
             return f"Welcome! Let's discuss: {topic}"
     
+    @opik.track if OPIK_AVAILABLE else lambda f: f
     async def determine_next_speaker(
         self,
         dialogue_state: DialogueState,
@@ -145,7 +152,8 @@ Maximum rounds: {self.config.max_rounds}
                 })
         
         if not speaking_candidates:
-            # Fallback: round-robin selection
+            # Fallback: strict round-robin selection
+            logger.info("No candidates found, using round-robin selection")
             return self._round_robin_selection(dialogue_state.active_agents, last_speaker_id)
         
         # Select the highest priority candidate
@@ -156,6 +164,22 @@ Maximum rounds: {self.config.max_rounds}
             f"Selected {selected['agent'].config.name} to speak next. "
             f"Reasoning: {selected['reasoning']}"
         )
+        
+        # Track selection with Opik
+        if OPIK_AVAILABLE:
+            try:
+                client = opik.Opik()
+                client.log_traces([{
+                    "name": "speaker_selection",
+                    "output": {
+                        "selected_agent": selected['agent'].config.name,
+                        "selection_reasoning": selected['reasoning'],
+                        "candidates_count": len(speaking_candidates),
+                        "last_speaker_id": last_speaker_id
+                    }
+                }])
+            except Exception:
+                pass
         
         return selected['agent_id']
     
@@ -170,19 +194,41 @@ Maximum rounds: {self.config.max_rounds}
         return priority_map.get(role, 1)
     
     def _round_robin_selection(self, active_agents: List[str], last_speaker_id: Optional[str]) -> Optional[str]:
-        """Fallback round-robin agent selection"""
+        """Fallback round-robin agent selection with role-based ordering"""
         if not active_agents:
             return None
         
+        # Order agents by role priority for consistent round-robin
+        ordered_agents = self._get_role_ordered_agents(active_agents)
+        
         if not last_speaker_id:
-            return active_agents[0]
+            return ordered_agents[0]
         
         try:
-            current_index = active_agents.index(last_speaker_id)
-            next_index = (current_index + 1) % len(active_agents)
-            return active_agents[next_index]
+            current_index = ordered_agents.index(last_speaker_id)
+            next_index = (current_index + 1) % len(ordered_agents)
+            return ordered_agents[next_index]
         except ValueError:
-            return active_agents[0]
+            return ordered_agents[0]
+    
+    def _get_role_ordered_agents(self, agent_ids: List[str]) -> List[str]:
+        """Order agents by role priority for consistent turn-taking"""
+        role_order = [AgentRole.LEAD, AgentRole.CONTRIBUTOR, AgentRole.SKEPTIC, AgentRole.MODERATOR]
+        
+        # Group agents by role
+        agents_by_role = {role: [] for role in role_order}
+        
+        for agent_id in agent_ids:
+            agent_config = self.get_agent_config(agent_id)
+            if agent_config:
+                agents_by_role[agent_config.role].append(agent_id)
+        
+        # Flatten in role order
+        ordered = []
+        for role in role_order:
+            ordered.extend(sorted(agents_by_role[role]))  # Sort for consistency
+        
+        return ordered
     
     async def generate_agent_response(
         self,
