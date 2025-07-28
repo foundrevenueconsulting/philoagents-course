@@ -8,9 +8,10 @@ interface ConversationControlsProps {
   isStreaming: boolean;
   sessionId: string;
   onRefresh: () => void;
+  conversationStatus?: string;
 }
 
-export function ConversationControls({ isStreaming, sessionId, onRefresh }: ConversationControlsProps) {
+export function ConversationControls({ isStreaming, sessionId, onRefresh, conversationStatus }: ConversationControlsProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -110,12 +111,19 @@ export function ConversationControls({ isStreaming, sessionId, onRefresh }: Conv
       {/* Status indicator */}
       <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 dark:bg-slate-700 rounded-lg">
         <div className={`w-2 h-2 rounded-full ${
-          isStreaming 
+          conversationStatus === 'completed' 
+            ? 'bg-blue-500'
+            : isStreaming 
             ? 'bg-green-500 animate-pulse' 
             : 'bg-blue-400 dark:bg-blue-500'
         }`} />
         <span className="text-xs text-gray-600 dark:text-gray-300">
-          {isStreaming ? 'Agent Speaking' : 'Ready to Continue'}
+          {conversationStatus === 'completed' 
+            ? 'Discussion Complete'
+            : isStreaming 
+            ? 'Agent Speaking' 
+            : 'Ready to Continue'
+          }
         </span>
       </div>
     </div>
