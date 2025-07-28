@@ -112,10 +112,10 @@ export function ConversationControls({ isStreaming, sessionId, onRefresh }: Conv
         <div className={`w-2 h-2 rounded-full ${
           isStreaming 
             ? 'bg-green-500 animate-pulse' 
-            : 'bg-gray-400 dark:bg-gray-500'
+            : 'bg-blue-400 dark:bg-blue-500'
         }`} />
         <span className="text-xs text-gray-600 dark:text-gray-300">
-          {isStreaming ? 'Live' : 'Idle'}
+          {isStreaming ? 'Agent Speaking' : 'Ready to Continue'}
         </span>
       </div>
     </div>

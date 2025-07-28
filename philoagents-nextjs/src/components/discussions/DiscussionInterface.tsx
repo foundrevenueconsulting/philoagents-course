@@ -147,6 +147,14 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
         setStreamingMessage('');
         setStreamingAgent(null);
         setCurrentSpeaker(null);
+        
+        // Auto-continue after a brief pause to show the "Continue Discussion" button
+        setTimeout(() => {
+          if (!userFeedbackPrompt && dialogueState?.status === 'in_progress') {
+            // Only auto-continue if no user feedback needed
+            // startStreaming(); // Commented out to let user control the flow
+          }
+        }, 2000);
         break;
 
       case 'system':
@@ -190,6 +198,12 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
 
   const getAgentConfig = (agentName: string) => {
     return config.agents.find(agent => agent.name === agentName);
+  };
+
+  const getNextAgentName = () => {
+    if (!dialogueState?.turn_info?.next_agent_id) return null;
+    const nextAgent = config.agents.find(agent => agent.id === dialogueState.turn_info.next_agent_id);
+    return nextAgent?.name || null;
   };
 
   if (isLoadingState) {
@@ -322,6 +336,30 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                   <p className="text-yellow-900 dark:text-yellow-100">{userFeedbackPrompt}</p>
                 </div>
               )}
+
+              {/* Continue Discussion Button */}
+              {!isStreaming && !userFeedbackPrompt && dialogueState?.topic && dialogueState?.status === 'in_progress' && (
+                <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-green-800 dark:text-green-200">
+                        {dialogueState.turn_info?.next_agent_id 
+                          ? `${getNextAgentName()} is ready to speak next`
+                          : 'Agents are ready to continue the discussion'
+                        }
+                      </span>
+                    </div>
+                    <button
+                      onClick={startStreaming}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      Continue Discussion
+                    </button>
+                  </div>
+                </div>
+              )}
               
               <div className="flex gap-3">
                 <div className="flex-1">
@@ -334,7 +372,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                         ? "Enter a topic or question to start the discussion..."
                         : userFeedbackPrompt 
                           ? "Respond to the agents' question..."
-                          : "Add your input to the discussion..."
+                          : "Add your input to the discussion (optional)..."
                     }
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     rows={2}
@@ -347,7 +385,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  Send
+                  {!dialogueState?.topic ? 'Start' : 'Send'}
                 </button>
               </div>
             </div>
