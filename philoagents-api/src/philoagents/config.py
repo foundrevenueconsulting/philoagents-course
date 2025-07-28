@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     MONGO_STATE_CHECKPOINT_COLLECTION: str = "philosopher_state_checkpoints"
     MONGO_STATE_WRITES_COLLECTION: str = "philosopher_state_writes"
     MONGO_LONG_TERM_MEMORY_COLLECTION: str = "philosopher_long_term_memory"
+    MONGO_MULTI_WAY_CONVERSATIONS_COLLECTION: str = "multi_way_conversations"
 
     # --- Comet ML & Opik Configuration ---
     COMET_API_KEY: str | None = Field(

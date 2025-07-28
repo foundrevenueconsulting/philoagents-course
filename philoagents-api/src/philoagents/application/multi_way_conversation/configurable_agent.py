@@ -5,6 +5,12 @@ import re
 from typing import Dict, List, Optional
 from groq import AsyncGroq
 
+try:
+    import opik
+    OPIK_AVAILABLE = True
+except ImportError:
+    OPIK_AVAILABLE = False
+
 from philoagents.config import settings
 from philoagents.domain.multi_way.conversation_config import AgentConfig, AgentRole
 from philoagents.domain.multi_way.dialogue_state import DialogueState
@@ -42,10 +48,12 @@ IMPORTANT INSTRUCTIONS:
 1. Stay true to your role and expertise
 2. Contribute meaningfully based on your domain knowledge
 3. Build upon or respond to what other agents have said
-4. If you need human input or clarification, use the phrase "@Ask User: [your question]"
+4. ONLY ask the user questions if absolutely critical for decision-making (use "@Ask User: [your question]")
 5. Keep responses focused and conversational (aim for 2-4 sentences unless elaboration is needed)
 6. Show your reasoning and expertise clearly
 7. Collaborate respectfully with other agents
+8. Continue the discussion by addressing other agents or building on their points
+9. This is a multi-agent discussion - speak to your colleagues, not the user unless requesting critical input
 
 ROLE-SPECIFIC BEHAVIOR:
 """
@@ -67,10 +75,12 @@ ROLE-SPECIFIC BEHAVIOR:
 """
         elif self.config.role == AgentRole.SKEPTIC:
             base_prompt += """
-- As the SKEPTIC, critically evaluate ideas and proposals
-- Point out potential issues, risks, or overlooked considerations
-- Challenge assumptions constructively
-- Ensure thorough evaluation of different perspectives
+- As the SKEPTIC, critically evaluate ideas and proposals by addressing your colleagues
+- Point out potential issues, risks, or overlooked considerations to the team
+- Challenge assumptions constructively by sharing specific concerns with other agents
+- Ensure thorough evaluation by stating what the team should consider
+- Present your skeptical insights as statements, not questions to the user
+- Example: "CFO, I'm concerned that..." or "CTO, we should consider that..."
 """
         elif self.config.role == AgentRole.MODERATOR:
             base_prompt += """
@@ -82,6 +92,7 @@ ROLE-SPECIFIC BEHAVIOR:
         
         return base_prompt
     
+    @opik.track if OPIK_AVAILABLE else lambda f: f
     async def generate_response(
         self,
         conversation_history: List[Dict[str, str]],
@@ -112,6 +123,23 @@ ROLE-SPECIFIC BEHAVIOR:
             })
         
         try:
+            # Track with Opik if available
+            if OPIK_AVAILABLE:
+                try:
+                    client = opik.Opik()
+                    client.log_traces([{
+                        "name": f"agent_response_{self.config.id}",
+                        "input": {"topic": current_topic, "last_speaker": last_speaker},
+                        "metadata": {
+                            "agent_id": self.config.id,
+                            "agent_name": self.config.name,
+                            "role": self.config.role.value,
+                            "message_count": len(conversation_history)
+                        }
+                    }])
+                except Exception:
+                    pass  # Silently fail if Opik not configured
+            
             response = await self.groq_client.chat.completions.create(
                 model=self.config.model,
                 messages=messages,
@@ -121,10 +149,33 @@ ROLE-SPECIFIC BEHAVIOR:
             )
             
             content = response.choices[0].message.content
-            return content.strip()
+            result = content.strip()
+            
+            # Log the result
+            if OPIK_AVAILABLE:
+                try:
+                    client = opik.Opik()
+                    client.log_traces([{
+                        "name": f"agent_response_complete_{self.config.id}",
+                        "output": result[:200] + "..." if len(result) > 200 else result
+                    }])
+                except Exception:
+                    pass
+            
+            return result
             
         except Exception as e:
-            return f"Error generating response: {str(e)}"
+            error_msg = f"Error generating response: {str(e)}"
+            if OPIK_AVAILABLE:
+                try:
+                    client = opik.Opik()
+                    client.log_traces([{
+                        "name": f"agent_error_{self.config.id}",
+                        "output": error_msg
+                    }])
+                except Exception:
+                    pass
+            return error_msg
     
     def should_speak_next(
         self,
