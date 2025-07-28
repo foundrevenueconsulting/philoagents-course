@@ -211,3 +211,17 @@ export interface StreamEvent {
   message?: string;
   dialogue_state?: DialogueState;
 }
+
+export interface ConversationSummary {
+  id: string;
+  session_id: string;
+  title: string;
+  config_name: string;
+  participant_names: string[];
+  status: 'waiting_for_topic' | 'in_progress' | 'waiting_for_user' | 'completed' | 'error';
+  total_rounds: number;
+  total_messages: number;
+  created_at: string;
+  updated_at: string;
+  ended_at?: string;
+}

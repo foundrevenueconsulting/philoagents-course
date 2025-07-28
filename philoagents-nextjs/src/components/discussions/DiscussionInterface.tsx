@@ -239,6 +239,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
             isStreaming={isStreaming}
             sessionId={sessionId}
             onRefresh={loadInitialState}
+            conversationStatus={dialogueState?.status}
           />
         </div>
 
@@ -337,6 +338,27 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                 </div>
               )}
 
+              {/* Conversation Completed Message */}
+              {dialogueState?.status === 'completed' && (
+                <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      Discussion Complete
+                    </span>
+                  </div>
+                  <p className="text-blue-900 dark:text-blue-100 text-sm">
+                    This conversation has reached its maximum number of rounds ({dialogueState.round_count} rounds completed). 
+                    You can review the discussion above, but no new responses can be generated.
+                  </p>
+                  <div className="mt-3 flex items-center gap-4 text-xs text-blue-700 dark:text-blue-300">
+                    <span>📊 {dialogueState.messages.length} total messages</span>
+                    <span>🔄 {dialogueState.round_count} rounds completed</span>
+                    <span>👥 {config.agents.length} participants</span>
+                  </div>
+                </div>
+              )}
+
               {/* Continue Discussion Button */}
               {!isStreaming && !userFeedbackPrompt && dialogueState?.topic && dialogueState?.status === 'in_progress' && (
                 <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
@@ -370,18 +392,20 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                     placeholder={
                       !dialogueState?.topic 
                         ? "Enter a topic or question to start the discussion..."
+                        : dialogueState?.status === 'completed'
+                          ? "This discussion has ended. You can start a new one from the dashboard."
                         : userFeedbackPrompt 
                           ? "Respond to the agents' question..."
                           : "Add your input to the discussion (optional)..."
                     }
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     rows={2}
-                    disabled={isStreaming}
+                    disabled={isStreaming || dialogueState?.status === 'completed'}
                   />
                 </div>
                 <button
                   onClick={handleSendMessage}
-                  disabled={!userInput.trim() || isStreaming}
+                  disabled={!userInput.trim() || isStreaming || dialogueState?.status === 'completed'}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
                 >
                   <Send className="w-4 h-4" />

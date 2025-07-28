@@ -105,6 +105,55 @@ export class MultiWayApiService {
   }
 
   /**
+   * List conversations with filtering and pagination
+   */
+  async listConversations(params?: {
+    config_id?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+    sort_by?: string;
+    sort_order?: string;
+  }): Promise<{
+    conversations: ConversationSummary[];
+    filter: any;
+    count: number;
+  }> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const url = `/test-conversations${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return await this.request<{
+      conversations: ConversationSummary[];
+      filter: any;
+      count: number;
+    }>(url);
+  }
+
+  /**
+   * Load a conversation from database
+   */
+  async loadConversation(sessionId: string): Promise<{
+    session_id: string;
+    dialogue_state: any;
+    metadata: any;
+    status: string;
+  }> {
+    return await this.request<{
+      session_id: string;
+      dialogue_state: any;
+      metadata: any;
+      status: string;
+    }>(`/api/multi-way/load/${sessionId}`);
+  }
+
+  /**
    * Stream conversation responses using Server-Sent Events
    */
   async streamConversation(
