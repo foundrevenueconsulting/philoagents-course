@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { ArrowLeft, History } from 'lucide-react';
 import { ConversationConfig } from '@/types/api';
 import { multiWayApiService } from '@/lib/services/MultiWayApiService';
 import { ConfigurationSelector } from '@/components/discussions/ConfigurationSelector';
@@ -15,6 +16,7 @@ export default function DiscussionsPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   // Check if Clerk is configured
   const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
@@ -22,7 +24,13 @@ export default function DiscussionsPage() {
 
   useEffect(() => {
     loadConfigurations();
-  }, []);
+    
+    // Check if we should resume a conversation from URL params
+    const resumeSessionId = searchParams.get('session');
+    if (resumeSessionId) {
+      resumeConversation(resumeSessionId);
+    }
+  }, [searchParams]);
 
   const loadConfigurations = async () => {
     try {
@@ -53,6 +61,35 @@ export default function DiscussionsPage() {
     setSelectedConfig(null);
     setSessionId(null);
     setError(null);
+    // Clear URL params
+    window.history.replaceState({}, '', '/discussions');
+  };
+
+  const resumeConversation = async (resumeSessionId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Load the conversation from the database
+      const loadedConversation = await multiWayApiService.loadConversation(resumeSessionId);
+      
+      // Find the matching configuration
+      const configId = loadedConversation.dialogue_state.config_id;
+      const config = Object.values(configurations).find(c => c.id === configId);
+      
+      if (!config) {
+        throw new Error('Configuration not found for this conversation');
+      }
+      
+      setSelectedConfig(config);
+      setSessionId(resumeSessionId);
+      
+    } catch (err) {
+      console.error('Failed to resume conversation:', err);
+      setError('Failed to resume conversation. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -84,7 +121,16 @@ export default function DiscussionsPage() {
               🗣️ Multi-Way Discussions
             </h1>
           </div>
-          {hasClerkKey && <UserButton afterSignOutUrl="/" />}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/discussions/history"
+              className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            >
+              <History className="w-4 h-4" />
+              View History
+            </Link>
+            {hasClerkKey && <UserButton afterSignOutUrl="/" />}
+          </div>
         </div>
       </nav>
 
@@ -100,6 +146,7 @@ export default function DiscussionsPage() {
           <ConfigurationSelector
             configurations={configurations}
             onSelectConfiguration={handleConfigSelect}
+            onResumeConversation={resumeConversation}
           />
         ) : (
           sessionId && (
