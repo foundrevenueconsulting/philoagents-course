@@ -32,6 +32,7 @@ class ConversationOrchestrator:
     def __init__(self):
         self.active_sessions: Dict[str, DialogueState] = {}
         self.persona_managers: Dict[str, PersonaManager] = {}
+        self.session_users: Dict[str, str] = {}  # Track which user owns each session
         self.repository = MultiWayConversationRepository()
     
     def get_available_configurations(self) -> Dict[str, ConversationConfig]:
@@ -45,6 +46,7 @@ class ConversationOrchestrator:
     async def start_conversation(
         self,
         config_id: str,
+        user_id: str,
         session_id: Optional[str] = None
     ) -> Tuple[str, DialogueState]:
         """
@@ -76,18 +78,20 @@ class ConversationOrchestrator:
         # Store session data
         self.active_sessions[session_id] = dialogue_state
         self.persona_managers[session_id] = persona_manager
+        self.session_users[session_id] = user_id
         
         # Persist to database
         try:
             self.repository.save_conversation(
                 session_id=session_id,
+                user_id=user_id,
                 dialogue_state=dialogue_state,
                 config=config
             )
         except Exception as e:
             logger.warning(f"Failed to persist conversation {session_id}: {e}")
         
-        logger.info(f"Started conversation session {session_id} with config {config_id}")
+        logger.info(f"Started conversation session {session_id} with config {config_id} for user {user_id}")
         return session_id, dialogue_state
     
     async def set_topic(self, session_id: str, topic: str) -> DialogueState:
@@ -396,19 +400,21 @@ class ConversationOrchestrator:
     def _persist_dialogue_state(self, session_id: str, dialogue_state: DialogueState) -> None:
         """Helper method to persist dialogue state to database"""
         persona_manager = self.persona_managers.get(session_id)
-        if not persona_manager:
+        user_id = self.session_users.get(session_id)
+        if not persona_manager or not user_id:
             return
         
         self.repository.save_conversation(
             session_id=session_id,
+            user_id=user_id,
             dialogue_state=dialogue_state,
             config=persona_manager.config
         )
     
-    async def load_conversation(self, session_id: str) -> Optional[DialogueState]:
-        """Load a conversation from the database"""
+    async def load_conversation(self, session_id: str, user_id: str) -> Optional[DialogueState]:
+        """Load a conversation from the database (user-authenticated)"""
         try:
-            persisted = self.repository.get_conversation_by_session_id(session_id)
+            persisted = self.repository.get_conversation_by_session_id(session_id, user_id)
             if not persisted:
                 return None
             
@@ -419,7 +425,8 @@ class ConversationOrchestrator:
                     persona_manager = PersonaManager(config)
                     self.active_sessions[session_id] = persisted.dialogue_state
                     self.persona_managers[session_id] = persona_manager
-                    logger.info(f"Loaded conversation {session_id} from database")
+                    self.session_users[session_id] = user_id
+                    logger.info(f"Loaded conversation {session_id} from database for user {user_id}")
             
             return persisted.dialogue_state
             
@@ -434,6 +441,6 @@ class ConversationOrchestrator:
         """List conversations with filtering and pagination"""
         return self.repository.list_conversations(filter_params)
     
-    async def get_persisted_conversation(self, session_id: str) -> Optional[PersistedConversation]:
-        """Get the full persisted conversation"""
-        return self.repository.get_conversation_by_session_id(session_id)
+    async def get_persisted_conversation(self, session_id: str, user_id: str) -> Optional[PersistedConversation]:
+        """Get the full persisted conversation (user-authenticated)"""
+        return self.repository.get_conversation_by_session_id(session_id, user_id)

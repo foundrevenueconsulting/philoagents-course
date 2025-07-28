@@ -24,6 +24,7 @@ class PersistedConversation(BaseModel):
     """
     id: Optional[str] = Field(default=None, description="MongoDB document ID")
     session_id: str = Field(description="Unique session identifier")
+    user_id: str = Field(description="ID of the user who owns this conversation")
     
     # Metadata
     metadata: ConversationMetadata = Field(description="Conversation metadata")
@@ -70,6 +71,7 @@ class PersistedConversation(BaseModel):
         return ConversationSummary(
             id=self.id,
             session_id=self.session_id,
+            user_id=self.user_id,
             title=self.generate_title(),
             config_name=self.metadata.config_name,
             participant_names=self.metadata.participant_names,
@@ -88,6 +90,7 @@ class ConversationSummary(BaseModel):
     """
     id: Optional[str] = Field(default=None, description="MongoDB document ID")
     session_id: str = Field(description="Unique session identifier")
+    user_id: str = Field(description="ID of the user who owns this conversation")
     title: str = Field(description="Conversation title")
     config_name: str = Field(description="Configuration name used")
     participant_names: List[str] = Field(description="Names of participating agents")
@@ -103,6 +106,7 @@ class ConversationListFilter(BaseModel):
     """
     Filter options for listing conversations
     """
+    user_id: str = Field(description="Filter by user ID (required for security)")
     config_id: Optional[str] = Field(default=None, description="Filter by configuration ID")
     status: Optional[ConversationStatus] = Field(default=None, description="Filter by status")
     limit: int = Field(default=20, ge=1, le=100, description="Maximum number of results")

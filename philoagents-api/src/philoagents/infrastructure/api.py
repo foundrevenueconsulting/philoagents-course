@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from opik.integrations.langchain import OpikTracer
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
@@ -20,6 +20,7 @@ from philoagents.application.multi_way_conversation.conversation_orchestrator im
 )
 from philoagents.domain.philosopher_factory import PhilosopherFactory
 from philoagents.config import settings
+from philoagents.infrastructure.auth import get_current_user, User
 
 from .opik_utils import configure
 
@@ -113,11 +114,15 @@ async def get_configurations():
 
 
 @app.post("/multi-way/start")
-async def start_conversation(request: StartConversationRequest):
-    """Start a new multi-way conversation"""
+async def start_conversation(
+    request: StartConversationRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Start a new multi-way conversation (requires authentication)"""
     try:
         session_id, dialogue_state = await conversation_orchestrator.start_conversation(
             config_id=request.config_id,
+            user_id=current_user.id,
             session_id=request.session_id
         )
         
@@ -134,9 +139,20 @@ async def start_conversation(request: StartConversationRequest):
 
 
 @app.post("/multi-way/message")
-async def send_message(request: ConversationMessageRequest):
-    """Send a message to the multi-way conversation"""
+async def send_message(
+    request: ConversationMessageRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Send a message to the multi-way conversation (requires authentication)"""
     try:
+        # Verify user ownership before processing message
+        existing_state = conversation_orchestrator.active_sessions.get(request.session_id)
+        if existing_state:
+            # Check if user owns this session
+            session_user = conversation_orchestrator.session_users.get(request.session_id)
+            if session_user != current_user.id:
+                raise HTTPException(status_code=403, detail="Access denied: You don't own this conversation")
+        
         dialogue_state = await conversation_orchestrator.process_user_message(
             session_id=request.session_id,
             message=request.message
@@ -155,9 +171,16 @@ async def send_message(request: ConversationMessageRequest):
 
 
 @app.get("/multi-way/{session_id}/stream")
-async def stream_conversation(session_id: str):
-    """Stream the next agent response in the conversation"""
+async def stream_conversation(
+    session_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Stream the next agent response in the conversation (requires authentication)"""
     try:
+        # Verify user ownership
+        session_user = conversation_orchestrator.session_users.get(session_id)
+        if session_user != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied: You don't own this conversation")
         async def generate_stream():
             try:
                 async for event in conversation_orchestrator.generate_next_response(session_id):
@@ -205,9 +228,17 @@ async def stream_conversation(session_id: str):
 
 
 @app.get("/multi-way/{session_id}")
-async def get_conversation_state(session_id: str):
-    """Get current conversation state"""
+async def get_conversation_state(
+    session_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get current conversation state (requires authentication)"""
     try:
+        # Verify user ownership
+        session_user = conversation_orchestrator.session_users.get(session_id)
+        if session_user and session_user != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied: You don't own this conversation")
+        
         dialogue_state = conversation_orchestrator.get_conversation_state(session_id)
         if not dialogue_state:
             raise HTTPException(status_code=404, detail="Session not found")
@@ -274,9 +305,10 @@ async def list_conversations(
     limit: int = 20,
     offset: int = 0,
     sort_by: str = "updated_at",
-    sort_order: str = "desc"
+    sort_order: str = "desc",
+    current_user: User = Depends(get_current_user)
 ):
-    """List multi-way conversations with filtering and pagination"""
+    """List multi-way conversations with filtering and pagination (requires authentication)"""
     try:
         from philoagents.domain.multi_way.conversation_persistence import ConversationListFilter
         from philoagents.domain.multi_way.dialogue_state import ConversationStatus
@@ -290,6 +322,7 @@ async def list_conversations(
                 raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
         
         filter_params = ConversationListFilter(
+            user_id=current_user.id,  # Always filter by authenticated user
             config_id=config_id,
             status=parsed_status,
             limit=min(limit, 100),  # Cap at 100
@@ -311,17 +344,20 @@ async def list_conversations(
 
 
 @app.get("/multi-way/load/{session_id}")
-async def load_conversation(session_id: str):
-    """Load a conversation from database (useful for resuming)"""
+async def load_conversation(
+    session_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Load a conversation from database (requires authentication)"""
     try:
-        # Try to load from database
-        dialogue_state = await conversation_orchestrator.load_conversation(session_id)
+        # Try to load from database (user-filtered)
+        dialogue_state = await conversation_orchestrator.load_conversation(session_id, current_user.id)
         
         if not dialogue_state:
             raise HTTPException(status_code=404, detail=f"Conversation {session_id} not found")
         
-        # Get the full persisted conversation for metadata
-        persisted = await conversation_orchestrator.get_persisted_conversation(session_id)
+        # Get the full persisted conversation for metadata (user-filtered)
+        persisted = await conversation_orchestrator.get_persisted_conversation(session_id, current_user.id)
         
         return {
             "session_id": session_id,

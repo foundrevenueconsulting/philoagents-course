@@ -23,6 +23,8 @@ dependencies = [
     "ipykernel>=6.29.5",
     "pydantic>=2.10.6",
     "datasketch>=1.6.5",
+    "python-jose[cryptography]>=3.3.0",
+    "python-multipart>=0.0.9",
 ]
 
 [dependency-groups]
