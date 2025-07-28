@@ -164,6 +164,7 @@ export default function ConversationHistory() {
               <option value="business_strategy">Business Strategy</option>
               <option value="research_team">Research Team</option>
               <option value="creative_team">Creative Team</option>
+              <option value="wellness_council">Wellness Council</option>
             </select>
 
             {/* Results Count */}

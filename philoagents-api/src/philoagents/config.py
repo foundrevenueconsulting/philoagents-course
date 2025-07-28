@@ -48,6 +48,17 @@ class Settings(BaseSettings):
     RAG_DEVICE: str = "cpu"
     RAG_CHUNK_SIZE: int = 256
 
+    # --- Authentication Configuration ---
+    JWT_SECRET_KEY: str | None = Field(
+        default=None, description="Secret key for generic JWT verification"
+    )
+    JWT_ALGORITHM: str = Field(
+        default="HS256", description="Algorithm for JWT verification"
+    )
+    CLERK_JWT_SECRET_KEY: str | None = Field(
+        default=None, description="Secret key for Clerk JWT verification"
+    )
+
     # --- Paths Configuration ---
     EVALUATION_DATASET_FILE_PATH: Path = Path("data/evaluation_dataset.json")
     EXTRACTION_METADATA_FILE_PATH: Path = Path("data/extraction_metadata.json")

@@ -33,6 +33,7 @@ class MultiWayConversationRepository:
     def save_conversation(
         self,
         session_id: str,
+        user_id: str,
         dialogue_state: DialogueState,
         config: ConversationConfig,
         metadata: Optional[ConversationMetadata] = None
@@ -41,21 +42,25 @@ class MultiWayConversationRepository:
         Save or update a conversation in MongoDB
         """
         try:
-            # Try to find existing conversation
-            existing = self.get_conversation_by_session_id(session_id)
+            # Try to find existing conversation (ensuring user owns it)
+            existing = self.get_conversation_by_session_id(session_id, user_id)
             
             if existing:
+                # Verify user ownership
+                if existing.user_id != user_id:
+                    raise ValueError(f"User {user_id} does not own conversation {session_id}")
+                
                 # Update existing conversation
                 existing.dialogue_state = dialogue_state
                 existing.update_stats()
                 
                 # Update in MongoDB
                 self.mongo_wrapper.collection.update_one(
-                    {"session_id": session_id},
+                    {"session_id": session_id, "user_id": user_id},
                     {"$set": existing.model_dump(exclude={"id"})}
                 )
                 
-                logger.info(f"Updated conversation {session_id}")
+                logger.info(f"Updated conversation {session_id} for user {user_id}")
                 return existing
             else:
                 # Create new conversation
@@ -70,6 +75,7 @@ class MultiWayConversationRepository:
                 
                 conversation = PersistedConversation(
                     session_id=session_id,
+                    user_id=user_id,
                     metadata=metadata,
                     dialogue_state=dialogue_state
                 )
@@ -81,40 +87,40 @@ class MultiWayConversationRepository:
                 )
                 conversation.id = str(result.inserted_id)
                 
-                logger.info(f"Created new conversation {session_id}")
+                logger.info(f"Created new conversation {session_id} for user {user_id}")
                 return conversation
                 
         except Exception as e:
             logger.error(f"Failed to save conversation {session_id}: {e}")
             raise
     
-    def get_conversation_by_session_id(self, session_id: str) -> Optional[PersistedConversation]:
+    def get_conversation_by_session_id(self, session_id: str, user_id: str) -> Optional[PersistedConversation]:
         """
-        Retrieve a conversation by session ID
+        Retrieve a conversation by session ID (user-filtered for security)
         """
         try:
             documents = self.mongo_wrapper.fetch_documents(
                 limit=1,
-                query={"session_id": session_id}
+                query={"session_id": session_id, "user_id": user_id}
             )
             return documents[0] if documents else None
         except Exception as e:
-            logger.error(f"Failed to get conversation {session_id}: {e}")
+            logger.error(f"Failed to get conversation {session_id} for user {user_id}: {e}")
             return None
     
-    def get_conversation_by_id(self, conversation_id: str) -> Optional[PersistedConversation]:
+    def get_conversation_by_id(self, conversation_id: str, user_id: str) -> Optional[PersistedConversation]:
         """
-        Retrieve a conversation by MongoDB document ID
+        Retrieve a conversation by MongoDB document ID (user-filtered for security)
         """
         try:
             from bson import ObjectId
             documents = self.mongo_wrapper.fetch_documents(
                 limit=1,
-                query={"_id": ObjectId(conversation_id)}
+                query={"_id": ObjectId(conversation_id), "user_id": user_id}
             )
             return documents[0] if documents else None
         except Exception as e:
-            logger.error(f"Failed to get conversation by ID {conversation_id}: {e}")
+            logger.error(f"Failed to get conversation by ID {conversation_id} for user {user_id}: {e}")
             return None
     
     def list_conversations(
@@ -125,8 +131,8 @@ class MultiWayConversationRepository:
         List conversations with filtering and pagination
         """
         try:
-            # Build MongoDB query
-            query = {}
+            # Build MongoDB query - always filter by user_id for security
+            query = {"user_id": filter_params.user_id}
             if filter_params.config_id:
                 query["metadata.config_id"] = filter_params.config_id
             if filter_params.status:
@@ -156,45 +162,45 @@ class MultiWayConversationRepository:
                     logger.warning(f"Failed to parse conversation document: {e}")
                     continue
             
-            logger.info(f"Retrieved {len(conversations)} conversations with filter: {filter_params}")
+            logger.info(f"Retrieved {len(conversations)} conversations for user {filter_params.user_id}")
             return conversations
             
         except Exception as e:
             logger.error(f"Failed to list conversations: {e}")
             return []
     
-    def delete_conversation(self, session_id: str) -> bool:
+    def delete_conversation(self, session_id: str, user_id: str) -> bool:
         """
-        Delete a conversation by session ID
+        Delete a conversation by session ID (user-filtered for security)
         """
         try:
-            result = self.mongo_wrapper.collection.delete_one({"session_id": session_id})
+            result = self.mongo_wrapper.collection.delete_one({"session_id": session_id, "user_id": user_id})
             success = result.deleted_count > 0
             
             if success:
-                logger.info(f"Deleted conversation {session_id}")
+                logger.info(f"Deleted conversation {session_id} for user {user_id}")
             else:
-                logger.warning(f"Conversation {session_id} not found for deletion")
+                logger.warning(f"Conversation {session_id} not found for user {user_id}")
             
             return success
             
         except Exception as e:
-            logger.error(f"Failed to delete conversation {session_id}: {e}")
+            logger.error(f"Failed to delete conversation {session_id} for user {user_id}: {e}")
             return False
     
-    def get_conversation_count(self, config_id: Optional[str] = None) -> int:
+    def get_conversation_count(self, user_id: str, config_id: Optional[str] = None) -> int:
         """
-        Get total count of conversations, optionally filtered by config
+        Get total count of conversations for a user, optionally filtered by config
         """
         try:
-            query = {}
+            query = {"user_id": user_id}
             if config_id:
                 query["metadata.config_id"] = config_id
             
             return self.mongo_wrapper.collection.count_documents(query)
             
         except Exception as e:
-            logger.error(f"Failed to count conversations: {e}")
+            logger.error(f"Failed to count conversations for user {user_id}: {e}")
             return 0
     
     def close(self):

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ConversationConfig, ConversationSummary } from '@/types/api';
-import { Users, Lightbulb, Briefcase, FlaskConical, Clock, MessageSquare } from 'lucide-react';
+import { Users, Lightbulb, Briefcase, FlaskConical, Heart, Clock, MessageSquare } from 'lucide-react';
 import { multiWayApiService } from '@/lib/services/MultiWayApiService';
 
 interface ConfigurationSelectorProps {
@@ -15,14 +15,16 @@ const formatIcons: Record<string, React.ReactNode> = {
   collaborative: <Users className="w-6 h-6" />,
   brainstorming: <Lightbulb className="w-6 h-6" />,
   debate: <FlaskConical className="w-6 h-6" />,
-  business: <Briefcase className="w-6 h-6" />
+  business: <Briefcase className="w-6 h-6" />,
+  wellness: <Heart className="w-6 h-6" />
 };
 
 const formatColors: Record<string, string> = {
   collaborative: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
   brainstorming: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200',
   debate: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
-  business: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
+  business: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
+  wellness: 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800 text-pink-800 dark:text-pink-200'
 };
 
 const roleIcons: Record<string, string> = {
