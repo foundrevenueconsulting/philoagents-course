@@ -1,11 +1,14 @@
 'use client';
 
-import { ConversationConfig } from '@/types/api';
-import { Users, Lightbulb, Briefcase, FlaskConical } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ConversationConfig, ConversationSummary } from '@/types/api';
+import { Users, Lightbulb, Briefcase, FlaskConical, Clock, MessageSquare } from 'lucide-react';
+import { multiWayApiService } from '@/lib/services/MultiWayApiService';
 
 interface ConfigurationSelectorProps {
   configurations: Record<string, ConversationConfig>;
   onSelectConfiguration: (config: ConversationConfig) => void;
+  onResumeConversation?: (sessionId: string) => void;
 }
 
 const formatIcons: Record<string, React.ReactNode> = {
@@ -36,7 +39,47 @@ const roleColors: Record<string, string> = {
   moderator: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
 };
 
-export function ConfigurationSelector({ configurations, onSelectConfiguration }: ConfigurationSelectorProps) {
+export function ConfigurationSelector({ 
+  configurations, 
+  onSelectConfiguration,
+  onResumeConversation 
+}: ConfigurationSelectorProps) {
+  const [recentConversations, setRecentConversations] = useState<ConversationSummary[]>([]);
+  const [loadingRecent, setLoadingRecent] = useState(false);
+
+  useEffect(() => {
+    loadRecentConversations();
+  }, []);
+
+  const loadRecentConversations = async () => {
+    try {
+      setLoadingRecent(true);
+      const response = await multiWayApiService.listConversations({
+        limit: 5,
+        sort_by: 'updated_at',
+        sort_order: 'desc'
+      });
+      setRecentConversations(response.conversations);
+    } catch (err) {
+      console.error('Failed to load recent conversations:', err);
+    } finally {
+      setLoadingRecent(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 1) {
+      return 'Just now';
+    } else if (diffInHours < 24) {
+      return `${Math.floor(diffInHours)}h ago`;
+    } else {
+      return `${Math.floor(diffInHours / 24)}d ago`;
+    }
+  };
   const configArray = Object.values(configurations);
 
   if (configArray.length === 0) {
@@ -65,6 +108,56 @@ export function ConfigurationSelector({ configurations, onSelectConfiguration }:
           Select a conversation configuration to watch AI agents collaborate and debate in real-time.
         </p>
       </div>
+
+      {/* Recent Conversations */}
+      {recentConversations.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Recent Conversations
+          </h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {recentConversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => onResumeConversation?.(conversation.session_id)}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium text-gray-900 dark:text-white text-sm truncate flex-1">
+                    {conversation.title}
+                  </h4>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                    conversation.status === 'completed' 
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
+                      : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                  }`}>
+                    {conversation.status === 'completed' ? 'Complete' : 'Active'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                  {conversation.config_name}
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="w-3 h-3" />
+                      {conversation.total_messages}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {formatDate(conversation.updated_at)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        Start New Discussion
+      </h3>
 
       <div className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {configArray.map((config) => (
