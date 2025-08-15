@@ -37,7 +37,7 @@ class JWTAuthenticator:
         self.jwt_secret_key = getattr(settings, 'JWT_SECRET_KEY', None)
         
     @lru_cache(maxsize=128)
-    def get_clerk_public_key(self, kid: str) -> Optional[str]:
+    def get_clerk_public_key(self, kid: str) -> Optional[dict]:
         """
         Fetch Clerk public key for JWT verification.
         In production, this should cache keys appropriately.
@@ -69,15 +69,37 @@ class JWTAuthenticator:
                 return None
             
             # Get public key for verification
-            public_key = self.get_clerk_public_key(kid)
-            if not public_key:
+            jwk = self.get_clerk_public_key(kid)
+            if not jwk:
                 logger.error(f"No public key found for kid: {kid}")
                 return None
+            
+            # Convert JWK to PEM format for jose library
+            from jose.utils import base64url_decode
+            from cryptography.hazmat.primitives import serialization
+            from cryptography.hazmat.primitives.asymmetric import rsa
+            
+            # Extract RSA components
+            n = base64url_decode(jwk["n"])
+            e = base64url_decode(jwk["e"])
+            
+            # Convert to integers
+            n_int = int.from_bytes(n, byteorder='big')
+            e_int = int.from_bytes(e, byteorder='big')
+            
+            # Create RSA public key
+            public_key = rsa.RSAPublicNumbers(e_int, n_int).public_key()
+            
+            # Serialize to PEM format
+            pem = public_key.serialize(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
             
             # Verify and decode token
             payload = jwt.decode(
                 token, 
-                public_key, 
+                pem.decode('utf-8'), 
                 algorithms=["RS256"],  # Clerk uses RS256
                 options={"verify_aud": False}  # Clerk may not set audience
             )
@@ -115,16 +137,16 @@ class JWTAuthenticator:
         Verify JWT token using available methods.
         First tries Clerk verification, then falls back to generic JWT.
         """
-        # Try Clerk verification first if secret is configured
-        if self.clerk_jwt_secret:
-            payload = self.verify_clerk_token(token)
-            if payload:
-                return payload
-        
-        # Fall back to generic JWT verification
-        payload = self.verify_generic_jwt(token)
+        # Always try Clerk verification first (no secret needed, uses public keys)
+        payload = self.verify_clerk_token(token)
         if payload:
             return payload
+        
+        # Fall back to generic JWT verification if JWT secret is configured
+        if self.jwt_secret_key:
+            payload = self.verify_generic_jwt(token)
+            if payload:
+                return payload
         
         return None
     
@@ -215,6 +237,55 @@ async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCrede
         return await get_current_user(credentials)
     except HTTPException:
         return None
+
+
+async def get_current_user_from_query_or_header(
+    token: Optional[str] = None,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))
+) -> User:
+    """
+    Authentication dependency that supports both query parameter and header authentication.
+    Used for streaming endpoints where EventSource cannot send custom headers.
+    """
+    try:
+        # Try token from query parameter first
+        if token:
+            payload = authenticator.verify_token(token)
+            if payload:
+                user = authenticator.extract_user_from_payload(payload)
+                logger.info(f"Authenticated user via query param: {user.id}")
+                return user
+        
+        # Fall back to header authentication
+        if credentials:
+            token_from_header = credentials.credentials
+            payload = authenticator.verify_token(token_from_header)
+            if payload:
+                user = authenticator.extract_user_from_payload(payload)
+                logger.info(f"Authenticated user via header: {user.id}")
+                return user
+        
+        # No valid authentication found
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing authentication token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    except ValueError as e:
+        logger.error(f"Token validation error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except Exception as e:
+        logger.error(f"Authentication error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication failed",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def require_auth_for_multi_way():

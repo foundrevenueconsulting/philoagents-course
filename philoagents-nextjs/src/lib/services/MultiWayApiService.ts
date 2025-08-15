@@ -10,9 +10,17 @@ import {
 
 export class MultiWayApiService {
   private apiUrl: string;
+  private getToken: (() => Promise<string | null>) | null = null;
 
   constructor() {
     this.apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  }
+
+  /**
+   * Set the token getter function for authentication
+   */
+  setTokenGetter(getToken: () => Promise<string | null>) {
+    this.getToken = getToken;
   }
 
   private async request<T>(
@@ -21,11 +29,25 @@ export class MultiWayApiService {
     data?: Record<string, unknown>
   ): Promise<T> {
     const url = `${this.apiUrl}${endpoint}`;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add authorization header if token getter is available
+    if (this.getToken) {
+      try {
+        const token = await this.getToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error('Failed to get auth token:', error);
+      }
+    }
+
     const options: RequestInit = {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: data ? JSON.stringify(data) : undefined,
     };
 
@@ -33,12 +55,20 @@ export class MultiWayApiService {
       const response = await fetch(url, options);
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Multi-way API request failed:', { 
+          url, 
+          method, 
+          status: response.status, 
+          statusText: response.statusText,
+          error: errorText 
+        });
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
       }
       
       return await response.json();
     } catch (error) {
-      console.error('Multi-way API request failed:', { url, method, error });
+      console.error('Multi-way API request failed:', { url, method, error: error.message });
       throw error;
     }
   }
@@ -162,7 +192,21 @@ export class MultiWayApiService {
     onError?: (error: Error) => void,
     onComplete?: () => void
   ): Promise<() => void> {
-    const url = `${this.apiUrl}/api/multi-way/${sessionId}/stream`;
+    let url = `${this.apiUrl}/api/multi-way/${sessionId}/stream`;
+    
+    // Add auth token to URL if available (EventSource doesn't support custom headers)
+    if (this.getToken) {
+      try {
+        const token = await this.getToken();
+        if (token) {
+          const urlObj = new URL(url);
+          urlObj.searchParams.set('token', token);
+          url = urlObj.toString();
+        }
+      } catch (error) {
+        console.warn('Failed to get auth token for streaming:', error);
+      }
+    }
     
     const eventSource = new EventSource(url);
     
@@ -260,8 +304,21 @@ export class MultiWayApiService {
    */
   async* streamConversationIterator(sessionId: string): AsyncGenerator<StreamEvent, void, unknown> {
     const url = `${this.apiUrl}/api/multi-way/${sessionId}/stream`;
+    const headers: Record<string, string> = {};
+
+    // Add authorization header if token getter is available
+    if (this.getToken) {
+      try {
+        const token = await this.getToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.warn('Failed to get auth token for streaming:', error);
+      }
+    }
     
-    const response = await fetch(url);
+    const response = await fetch(url, { headers });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }

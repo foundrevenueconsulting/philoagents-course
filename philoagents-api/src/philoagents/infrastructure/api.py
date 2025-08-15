@@ -20,7 +20,7 @@ from philoagents.application.multi_way_conversation.conversation_orchestrator im
 )
 from philoagents.domain.philosopher_factory import PhilosopherFactory
 from philoagents.config import settings
-from philoagents.infrastructure.auth import get_current_user, User
+from philoagents.infrastructure.clerk_auth import get_current_user, get_current_user_from_query_or_header, User
 
 from .opik_utils import configure
 
@@ -173,7 +173,8 @@ async def send_message(
 @app.get("/multi-way/{session_id}/stream")
 async def stream_conversation(
     session_id: str,
-    current_user: User = Depends(get_current_user)
+    token: Optional[str] = None,
+    current_user: User = Depends(get_current_user_from_query_or_header)
 ):
     """Stream the next agent response in the conversation (requires authentication)"""
     try:

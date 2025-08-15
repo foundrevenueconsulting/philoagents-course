@@ -55,8 +55,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = Field(
         default="HS256", description="Algorithm for JWT verification"
     )
-    CLERK_JWT_SECRET_KEY: str | None = Field(
-        default=None, description="Secret key for Clerk JWT verification"
+    CLERK_SECRET_KEY: str | None = Field(
+        default=None, description="Clerk secret key for authentication"
     )
 
     # --- Paths Configuration ---

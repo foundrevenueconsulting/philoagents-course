@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Send, Users, Clock, MessageSquare, Pause, Play, Square } from 'lucide-react';
 import { ConversationConfig, DialogueState, Message, StreamEvent } from '@/types/api';
-import { multiWayApiService } from '@/lib/services/MultiWayApiService';
+import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 import { AgentMessage } from './AgentMessage';
 import { ParticipantsList } from './ParticipantsList';
 import { ConversationControls } from './ConversationControls';
@@ -28,6 +28,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamCleanupRef = useRef<(() => void) | null>(null);
+  const multiWayApiService = useMultiWayApi();
 
   useEffect(() => {
     loadInitialState();

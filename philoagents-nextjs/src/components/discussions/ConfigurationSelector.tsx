@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ConversationConfig, ConversationSummary } from '@/types/api';
 import { Users, Lightbulb, Briefcase, FlaskConical, Heart, Clock, MessageSquare } from 'lucide-react';
-import { multiWayApiService } from '@/lib/services/MultiWayApiService';
+import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 
 interface ConfigurationSelectorProps {
   configurations: Record<string, ConversationConfig>;
@@ -48,6 +48,7 @@ export function ConfigurationSelector({
 }: ConfigurationSelectorProps) {
   const [recentConversations, setRecentConversations] = useState<ConversationSummary[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
+  const multiWayApiService = useMultiWayApi();
 
   useEffect(() => {
     loadRecentConversations();
