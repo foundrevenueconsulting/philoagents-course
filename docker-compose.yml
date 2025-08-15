@@ -76,21 +76,25 @@ services:
       timeout: 10s
       retries: 3
 
-  ui:
-    container_name: philoagents-ui
-    build:
-      context: ./philoagents-ui
-      dockerfile: Dockerfile.local
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./philoagents-ui:/app
-      - /app/node_modules
-    depends_on:
-      - api
-      - multiplayer
-    networks:
-      - philoagents-network
+# Next.js UI runs locally via npm run dev (port 3000)
+  # Use: cd philoagents-nextjs && npm run dev
+
+  # Legacy Phaser.js game UI (uncomment if needed separately)
+  # game-ui:
+  #   container_name: philoagents-game-ui
+  #   build:
+  #     context: ./philoagents-ui
+  #     dockerfile: Dockerfile.local
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./philoagents-ui:/app
+  #     - /app/node_modules
+  #   depends_on:
+  #     - api
+  #     - multiplayer
+  #   networks:
+  #     - philoagents-network
 
 volumes:
   data:

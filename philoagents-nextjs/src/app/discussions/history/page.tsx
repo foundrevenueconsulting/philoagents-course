@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, MessageSquare, Users, Clock, Filter, Search } from 'lucide-react';
-import { multiWayApiService } from '@/lib/services/MultiWayApiService';
+import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 import { ConversationSummary } from '@/types/api';
 
 export default function ConversationHistory() {
@@ -12,6 +12,7 @@ export default function ConversationHistory() {
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const multiWayApiService = useMultiWayApi();
   const [filters, setFilters] = useState({
     status: '',
     config_id: '',

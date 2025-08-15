@@ -18,7 +18,7 @@ cp .env.example .env  # Configure API keys as needed
 **Infrastructure Management:**
 ```bash
 # From root directory
-make infrastructure-up      # Start all services (MongoDB, API, UI)
+make infrastructure-up      # Start core services (MongoDB, API, Multiplayer)
 make infrastructure-stop    # Stop all services
 make infrastructure-build   # Build Docker images without running
 
@@ -26,6 +26,9 @@ make infrastructure-build   # Build Docker images without running
 make infrastructure-restart    # Quick restart with rebuild
 make infrastructure-logs       # View container logs
 make infrastructure-status     # Check container status
+
+# Next.js Frontend (run separately):
+cd philoagents-nextjs && npm run dev  # Start authenticated UI on port 3000
 ```
 
 **Development in philoagents-api/:**
@@ -98,10 +101,12 @@ src/philoagents/
 - MongoDB connection defaults to local Docker instance
 
 ### Access Points
-- Game UI: http://localhost:8080
-- API docs: http://localhost:8000/docs
-- WebSocket: ws://localhost:8000/ws/chat (real-time streaming)
-- REST: POST /chat (standard chat), POST /reset-memory (clear state)
+- **Main UI (Next.js with Clerk auth)**: http://localhost:3000
+- **Multi-way Conversations**: http://localhost:3000/discussions (requires authentication)
+- **Legacy Game UI (Phaser.js)**: http://localhost:8080 (if running separately)
+- **API docs**: http://localhost:8000/docs
+- **WebSocket**: ws://localhost:8000/ws/chat (real-time streaming)
+- **REST**: POST /chat (standard chat), POST /reset-memory (clear state)
 
 ## Development Workflow
 

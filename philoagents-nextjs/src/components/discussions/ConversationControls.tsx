@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { RefreshCw, Download, Square, BarChart3, Settings } from 'lucide-react';
-import { multiWayApiService } from '@/lib/services/MultiWayApiService';
+import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 
 interface ConversationControlsProps {
   isStreaming: boolean;
@@ -14,6 +14,7 @@ interface ConversationControlsProps {
 export function ConversationControls({ isStreaming, sessionId, onRefresh, conversationStatus }: ConversationControlsProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const multiWayApiService = useMultiWayApi();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, History } from 'lucide-react';
 import { ConversationConfig } from '@/types/api';
-import { multiWayApiService } from '@/lib/services/MultiWayApiService';
+import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 import { ConfigurationSelector } from '@/components/discussions/ConfigurationSelector';
 import { DiscussionInterface } from '@/components/discussions/DiscussionInterface';
 
@@ -17,6 +17,7 @@ export default function DiscussionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const multiWayApiService = useMultiWayApi();
 
   // Check if Clerk is configured
   const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
