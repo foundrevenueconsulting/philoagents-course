@@ -1,5 +1,4 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
 export default async function Dashboard() {
@@ -15,15 +14,6 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      <nav className="bg-white dark:bg-slate-800 shadow">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            The Great Game of Life
-          </h1>
-          {hasClerkKey && <UserButton afterSignOutUrl="/" />}
-        </div>
-      </nav>
-
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -34,7 +24,39 @@ export default async function Dashboard() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          
+
+          <Link
+            href="/discussions"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700 ring-2 ring-blue-500/20"
+          >
+            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+              🗣️ BioType Counsel Discussions
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Watch different AI Biotype agents debate and collaborate on a topic of your choice.
+            </p>
+            <div className="mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+              NEW FEATURE
+            </div>
+          </Link>
+
+          <Link
+            href="/practice"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700 ring-2 ring-purple-500/20"
+          >
+            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+              🧠 BioType Recognition Practice
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Train your ability to recognize BioTypes from images.
+            </p>
+            <div className="mt-2 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
+              NEW FEATURE
+            </div>
+          </Link>
+          
           <Link
             href="/game"
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
@@ -48,21 +70,6 @@ export default async function Dashboard() {
           </Link>
 
           <Link
-            href="/discussions"
-            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700 ring-2 ring-blue-500/20"
-          >
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              🗣️ Multi-Way Discussions
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Watch AI agents debate and collaborate in real-time conversations.
-            </p>
-            <div className="mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
-              NEW FEATURE
-            </div>
-          </Link>
-
-          <Link
             href="/dashboard/conversations"
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
           >
@@ -70,7 +77,7 @@ export default async function Dashboard() {
               💬 Conversation History
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Review your past philosophical discussions and insights.
+              Review your past discussions and insights.
             </p>
           </Link>
 
@@ -97,9 +104,9 @@ export default async function Dashboard() {
                 1
               </span>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Enter the Game World</p>
+                <p className="font-medium text-gray-900 dark:text-white">Start BioType Recognition Practice</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Click &quot;Enter Game World&quot; to join the interactive philosophy environment.
+                  Click &quot;BioType Recognition Practice&quot; to train your ability to identify biological temperaments from facial features and body language.
                 </p>
               </div>
             </div>
@@ -108,9 +115,9 @@ export default async function Dashboard() {
                 2
               </span>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Choose Your Philosopher</p>
+                <p className="font-medium text-gray-900 dark:text-white">Explore BioType Counsel Discussions</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Walk up to any philosopher in the world to start a conversation.
+                  Watch different AI BioType agents debate and collaborate on topics of your choice in real-time conversations.
                 </p>
               </div>
             </div>
@@ -119,9 +126,9 @@ export default async function Dashboard() {
                 3
               </span>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Engage in Deep Discussion</p>
+                <p className="font-medium text-gray-900 dark:text-white">Track Your Progress</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Ask questions about consciousness, ethics, reality, and existence.
+                  Review your recognition accuracy, response times, and conversation history to improve your BioType understanding.
                 </p>
               </div>
             </div>
