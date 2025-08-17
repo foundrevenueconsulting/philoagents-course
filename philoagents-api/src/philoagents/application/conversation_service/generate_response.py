@@ -60,7 +60,9 @@ async def get_response(
             opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
 
             # Create user-specific thread ID
-            base_thread_id = f"{user_id}_{philosopher_id}" if user_id else philosopher_id
+            base_thread_id = (
+                f"{user_id}_{philosopher_id}" if user_id else philosopher_id
+            )
             thread_id = (
                 base_thread_id if not new_thread else f"{base_thread_id}_{uuid.uuid4()}"
             )
@@ -136,7 +138,9 @@ async def get_streaming_response(
             opik_tracer = OpikTracer(graph=graph.get_graph(xray=True))
 
             # Create user-specific thread ID
-            base_thread_id = f"{user_id}_{philosopher_id}" if user_id else philosopher_id
+            base_thread_id = (
+                f"{user_id}_{philosopher_id}" if user_id else philosopher_id
+            )
             thread_id = (
                 base_thread_id if not new_thread else f"{base_thread_id}_{uuid.uuid4()}"
             )

@@ -1,6 +1,7 @@
 """
 Configuration models for multi-way conversations
 """
+
 from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field
@@ -8,6 +9,7 @@ from pydantic import BaseModel, Field
 
 class AgentRole(str, Enum):
     """Roles that agents can play in multi-way conversations"""
+
     LEAD = "lead"
     CONTRIBUTOR = "contributor"
     SKEPTIC = "skeptic"
@@ -16,6 +18,7 @@ class AgentRole(str, Enum):
 
 class ConversationFormat(str, Enum):
     """Different conversation formats available"""
+
     DEBATE = "debate"
     COLLABORATIVE = "collaborative"
     BRAINSTORMING = "brainstorming"
@@ -25,7 +28,7 @@ class ConversationFormat(str, Enum):
 
 class AgentConfig(BaseModel):
     """Configuration for an individual agent in multi-way conversation"""
-    
+
     id: str = Field(description="Unique identifier for the agent")
     name: str = Field(description="Display name of the agent")
     role: AgentRole = Field(description="Role of the agent in conversation")
@@ -34,8 +37,10 @@ class AgentConfig(BaseModel):
         default=[], description="List of personality traits"
     )
     system_prompt: str = Field(description="System prompt defining agent behavior")
-    model: str = Field(default="llama-3.3-70b-versatile", description="LLM model to use")
-    
+    model: str = Field(
+        default="llama-3.3-70b-versatile", description="LLM model to use"
+    )
+
     # Visual configuration for UI
     primary_color: str = Field(description="Primary color for agent's visual theme")
     secondary_color: str = Field(description="Secondary color for agent's visual theme")
@@ -44,7 +49,7 @@ class AgentConfig(BaseModel):
 
 class ConversationConfig(BaseModel):
     """Configuration for a multi-way conversation setup"""
-    
+
     id: str = Field(description="Unique identifier for the configuration")
     name: str = Field(description="Display name of the configuration")
     description: str = Field(description="Description of the conversation setup")
@@ -52,18 +57,21 @@ class ConversationConfig(BaseModel):
     agents: List[AgentConfig] = Field(
         description="List of agents participating in the conversation"
     )
-    max_rounds: int = Field(default=50, description="Maximum number of conversation rounds")
-    allow_human_feedback: bool = Field(
-        default=True, description="Whether users can provide feedback during conversation"
+    max_rounds: int = Field(
+        default=50, description="Maximum number of conversation rounds"
     )
-    
+    allow_human_feedback: bool = Field(
+        default=True,
+        description="Whether users can provide feedback during conversation",
+    )
+
     def get_agent_by_role(self, role: AgentRole) -> Optional[AgentConfig]:
         """Get first agent with specified role"""
         for agent in self.agents:
             if agent.role == role:
                 return agent
         return None
-    
+
     def get_agent_by_id(self, agent_id: str) -> Optional[AgentConfig]:
         """Get agent by ID"""
         for agent in self.agents:
@@ -89,7 +97,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a CEO focused on strategic vision and company direction. You guide discussions toward actionable outcomes and consider market opportunities, competitive positioning, and long-term growth.",
                 primary_color="#1E40AF",
                 secondary_color="#3B82F6",
-                avatar_style="formal"
+                avatar_style="formal",
             ),
             AgentConfig(
                 id="cfo",
@@ -100,7 +108,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a CFO who analyzes financial implications of strategic decisions. You focus on ROI, budget constraints, financial risks, and sustainable growth models.",
                 primary_color="#059669",
                 secondary_color="#10B981",
-                avatar_style="professional"
+                avatar_style="professional",
             ),
             AgentConfig(
                 id="cto",
@@ -111,7 +119,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a CTO who evaluates technology implications and feasibility. You consider technical architecture, scalability, security, and innovation opportunities.",
                 primary_color="#7C3AED",
                 secondary_color="#A855F7",
-                avatar_style="technical"
+                avatar_style="technical",
             ),
             AgentConfig(
                 id="marketing_director",
@@ -122,11 +130,10 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Marketing Director who challenges assumptions with market data and customer insights. You question strategies by addressing your colleagues directly and sharing specific concerns about customer needs and market trends. Present your challenges as insights for the team to consider, not as questions for the user.",
                 primary_color="#DC2626",
                 secondary_color="#EF4444",
-                avatar_style="creative"
-            )
-        ]
+                avatar_style="creative",
+            ),
+        ],
     ),
-    
     "research_team": ConversationConfig(
         id="research_team",
         name="Scientific Research Discussion",
@@ -142,7 +149,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Lead Researcher who guides scientific discussions with methodological rigor. You ensure research questions are well-defined and approaches are scientifically sound.",
                 primary_color="#0F766E",
                 secondary_color="#14B8A6",
-                avatar_style="academic"
+                avatar_style="academic",
             ),
             AgentConfig(
                 id="data_scientist",
@@ -153,7 +160,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Data Scientist who provides statistical insights and analytical approaches. You focus on data quality, statistical significance, and appropriate modeling techniques.",
                 primary_color="#1E40AF",
                 secondary_color="#3B82F6",
-                avatar_style="technical"
+                avatar_style="technical",
             ),
             AgentConfig(
                 id="research_ethicist",
@@ -164,11 +171,10 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Research Ethicist who ensures ethical considerations are addressed. You question research approaches that may have ethical implications or compliance issues.",
                 primary_color="#DC2626",
                 secondary_color="#EF4444",
-                avatar_style="formal"
-            )
-        ]
+                avatar_style="formal",
+            ),
+        ],
     ),
-    
     "creative_team": ConversationConfig(
         id="creative_team",
         name="Creative Brainstorming",
@@ -184,7 +190,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Creative Director who leads innovative thinking and artistic vision. You encourage bold ideas and help transform concepts into compelling creative solutions.",
                 primary_color="#DC2626",
                 secondary_color="#F59E0B",
-                avatar_style="artistic"
+                avatar_style="artistic",
             ),
             AgentConfig(
                 id="writer",
@@ -195,7 +201,7 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Writer who develops narrative elements and messaging. You focus on storytelling, audience engagement, and clear communication of ideas.",
                 primary_color="#7C3AED",
                 secondary_color="#A855F7",
-                avatar_style="literary"
+                avatar_style="literary",
             ),
             AgentConfig(
                 id="designer",
@@ -206,11 +212,10 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You are a Designer who considers visual and experiential aspects. You think about user interaction, aesthetic appeal, and practical implementation of creative concepts.",
                 primary_color="#059669",
                 secondary_color="#10B981",
-                avatar_style="design"
-            )
-        ]
+                avatar_style="design",
+            ),
+        ],
     ),
-
     "wellness_council": ConversationConfig(
         id="wellness_council",
         name="Wellness Council",
@@ -222,33 +227,48 @@ PREDEFINED_CONFIGURATIONS = {
                 name="Damawi (Sanguine Guide)",
                 role=AgentRole.LEAD,
                 domain_expertise="Joy, connection, and energetic wellness",
-                personality_traits=["enthusiastic", "optimistic", "social", "adaptable"],
+                personality_traits=[
+                    "enthusiastic",
+                    "optimistic",
+                    "social",
+                    "adaptable",
+                ],
                 system_prompt="You embody the Sanguine biotype - warm, enthusiastic, and naturally optimistic. You speak with infectious energy and help others find joy in their wellness journey. Your approach to health emphasizes movement, variety, social connection, and creative expression. You encourage others to embrace life's pleasures while building sustainable habits. Address your fellow council members directly when building on their insights, and speak to the human seeking guidance with encouraging, uplifting energy. Remember to balance your natural enthusiasm with grounding practices when needed.",
                 primary_color="#F59E0B",
                 secondary_color="#FCD34D",
-                avatar_style="vibrant"
+                avatar_style="vibrant",
             ),
             AgentConfig(
                 id="choleric_advisor",
                 name="Safrawi (Choleric Advisor)",
                 role=AgentRole.CONTRIBUTOR,
                 domain_expertise="Transformation, leadership, and purposeful action",
-                personality_traits=["decisive", "passionate", "goal-oriented", "protective"],
+                personality_traits=[
+                    "decisive",
+                    "passionate",
+                    "goal-oriented",
+                    "protective",
+                ],
                 system_prompt="You embody the Choleric biotype - intense, focused, and naturally driven. You help others channel their inner fire into transformative action and clear purpose. Your approach emphasizes decisive goal-setting, intense physical practices, and strategic life planning. You challenge others to stop procrastinating and take bold action toward their health and dreams. When speaking with your fellow advisors, be direct and action-focused. Provide clear, decisive guidance while remembering to temper intensity with cooling practices and strategic rest.",
                 primary_color="#DC2626",
                 secondary_color="#F87171",
-                avatar_style="strong"
+                avatar_style="strong",
             ),
             AgentConfig(
                 id="melancholic_sage",
                 name="Saudawi (Melancholic Sage)",
                 role=AgentRole.CONTRIBUTOR,
                 domain_expertise="Deep understanding, systematic wellness, and meaningful patterns",
-                personality_traits=["thoughtful", "analytical", "perfectionist", "empathetic"],
+                personality_traits=[
+                    "thoughtful",
+                    "analytical",
+                    "perfectionist",
+                    "empathetic",
+                ],
                 system_prompt="You embody the Melancholic biotype - deep, thoughtful, and naturally seeking perfection and meaning. You help others understand the root causes of their challenges and create systematic, detailed approaches to wellness. Your wisdom comes from careful observation and pattern recognition. You emphasize consistent routines, detailed self-knowledge, and addressing underlying causes rather than symptoms. When engaging with your fellow sages, share your analytical insights and deeper observations. Guide humans with patience and detailed understanding, while reminding them that 'good enough' can sometimes be the perfect medicine for an overthinking mind.",
                 primary_color="#6366F1",
                 secondary_color="#A5B4FC",
-                avatar_style="wise"
+                avatar_style="wise",
             ),
             AgentConfig(
                 id="phlegmatic_healer",
@@ -259,8 +279,8 @@ PREDEFINED_CONFIGURATIONS = {
                 system_prompt="You embody the Phlegmatic biotype - calm, stable, and naturally peaceful. You create a safe space where healing can unfold naturally and help others find balance through gentle, consistent practices. Your approach emphasizes patience, emotional stability, and honoring the body's natural wisdom and timing. You help mediate between different approaches and find common ground. When speaking with your fellow healers, offer gentle wisdom and help synthesize their insights. Guide humans with steady, nurturing support while encouraging them to express their needs and avoid stagnation through gentle activation.",
                 primary_color="#10B981",
                 secondary_color="#6EE7B7",
-                avatar_style="peaceful"
-            )
-        ]
-    )
+                avatar_style="peaceful",
+            ),
+        ],
+    ),
 }
