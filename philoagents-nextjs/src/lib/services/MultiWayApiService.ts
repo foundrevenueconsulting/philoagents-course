@@ -5,7 +5,8 @@ import {
   MultiWayConversationResponse,
   DialogueState,
   Message,
-  StreamEvent
+  StreamEvent,
+  ConversationSummary
 } from '@/types/api';
 
 export class MultiWayApiService {
@@ -26,7 +27,7 @@ export class MultiWayApiService {
   private async request<T>(
     endpoint: string, 
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET', 
-    data?: Record<string, unknown>
+    data?: unknown
   ): Promise<T> {
     const url = `${this.apiUrl}${endpoint}`;
     const headers: Record<string, string> = {
@@ -68,7 +69,8 @@ export class MultiWayApiService {
       
       return await response.json();
     } catch (error) {
-      console.error('Multi-way API request failed:', { url, method, error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Multi-way API request failed:', { url, method, error: errorMessage });
       throw error;
     }
   }
@@ -276,10 +278,10 @@ export class MultiWayApiService {
       });
     });
 
-    eventSource.addEventListener('error', (event) => {
+    eventSource.addEventListener('error', () => {
       onEvent({
         type: 'error',
-        message: event.data
+        message: 'Connection error occurred'
       });
     });
 
