@@ -76,7 +76,15 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
       setDialogueState(response.dialogue_state || null);
       
       if (response.dialogue_state) {
-        setMessages(response.dialogue_state.messages);
+        // Add the user message to the existing messages instead of replacing all
+        const userMessage: Message = {
+          id: `user-${Date.now()}`,
+          role: 'user',
+          content: message,
+          timestamp: new Date().toISOString(),
+          metadata: {}
+        };
+        setMessages(prev => [...prev, userMessage]);
         setUserFeedbackPrompt(null); // Clear any pending feedback prompt
       }
 
@@ -148,14 +156,6 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
         setStreamingMessage('');
         setStreamingAgent(null);
         setCurrentSpeaker(null);
-        
-        // Auto-continue after a brief pause to show the "Continue Discussion" button
-        setTimeout(() => {
-          if (!userFeedbackPrompt && dialogueState?.status === 'in_progress') {
-            // Only auto-continue if no user feedback needed
-            // startStreaming(); // Commented out to let user control the flow
-          }
-        }, 2000);
         break;
 
       case 'system':
@@ -186,8 +186,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
   const handleStreamComplete = () => {
     setIsStreaming(false);
     setCurrentSpeaker(null);
-    // Refresh conversation state
-    loadInitialState();
+    // No need to reload state - messages are already updated via streaming
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -273,7 +272,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
 
         {/* Main Conversation */}
         <div className="lg:col-span-3">
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 flex flex-col h-[600px]">
+          <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 flex flex-col h-[800px]">
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {messages.length === 0 && !dialogueState?.topic ? (
