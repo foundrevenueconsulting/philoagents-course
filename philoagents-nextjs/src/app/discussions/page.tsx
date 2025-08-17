@@ -100,7 +100,7 @@ function DiscussionsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
         {error && (
@@ -132,9 +132,9 @@ function DiscussionsContent() {
 export default function DiscussionsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderBottomColor: '#B8623F' }}></div>
           <p className="text-gray-600 dark:text-gray-300">Loading discussions...</p>
         </div>
       </div>

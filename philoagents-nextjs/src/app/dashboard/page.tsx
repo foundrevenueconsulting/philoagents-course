@@ -5,14 +5,14 @@ export default async function Dashboard() {
   const user = await getCurrentUserWithFeatures();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
+        <div className="mb-8 text-center">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            🧠 Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Ready to continue your philosophical journey?
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Ready to continue your BioType training journey? Choose your next learning adventure.
           </p>
         </div>
 
@@ -21,7 +21,8 @@ export default async function Dashboard() {
 
           <Link
             href="/discussions"
-            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700 ring-2 ring-blue-500/20"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
+            style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
               🗣️ BioType Counsel Discussions
@@ -29,14 +30,15 @@ export default async function Dashboard() {
             <p className="text-gray-600 dark:text-gray-300">
               Watch different AI Biotype agents debate and collaborate on a topic of your choice.
             </p>
-            <div className="mt-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+            <div className="mt-3 text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: '#B8623F', color: 'white' }}>
               NEW FEATURE
             </div>
           </Link>
 
           <Link
             href="/practice"
-            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700 ring-2 ring-purple-500/20"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
+            style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
               🧠 BioType Recognition Practice
@@ -44,14 +46,15 @@ export default async function Dashboard() {
             <p className="text-gray-600 dark:text-gray-300">
               Train your ability to recognize BioTypes from images.
             </p>
-            <div className="mt-2 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
+            <div className="mt-3 text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: '#B8623F', color: 'white' }}>
               NEW FEATURE
             </div>
           </Link>
           
           <Link
             href="/game"
-            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
+            style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
               🎮 Enter Game World
@@ -63,7 +66,8 @@ export default async function Dashboard() {
 
           <Link
             href="/dashboard/conversations"
-            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
+            style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
               💬 Conversation History
@@ -75,7 +79,8 @@ export default async function Dashboard() {
 
           <Link
             href="/profile"
-            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700"
+            className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
+            style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
               👤 Profile & Settings
@@ -86,40 +91,40 @@ export default async function Dashboard() {
           </Link>
         </div>
 
-        <div className="mt-12 bg-white dark:bg-slate-800 p-6 rounded-lg shadow border border-gray-200 dark:border-slate-700">
-          <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-            Quick Start Guide
+        <div className="mt-16 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-xl border-t-4" style={{ borderTopColor: '#B8623F' }}>
+          <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
+            🚀 Quick Start Guide
           </h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <span className="w-8 h-8 rounded-full text-white font-semibold flex items-center justify-center flex-shrink-0 mt-1" style={{ backgroundColor: '#B8623F' }}>
                 1
               </span>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Start BioType Recognition Practice</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="font-semibold text-lg text-gray-900 dark:text-white">Start BioType Recognition Practice</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
                   Click &quot;BioType Recognition Practice&quot; to train your ability to identify biological temperaments from facial features and body language.
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="flex items-start gap-4">
+              <span className="w-8 h-8 rounded-full text-white font-semibold flex items-center justify-center flex-shrink-0 mt-1" style={{ backgroundColor: '#B8623F' }}>
                 2
               </span>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Explore BioType Counsel Discussions</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="font-semibold text-lg text-gray-900 dark:text-white">Explore BioType Counsel Discussions</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
                   Watch different AI BioType agents debate and collaborate on topics of your choice in real-time conversations.
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="flex items-start gap-4">
+              <span className="w-8 h-8 rounded-full text-white font-semibold flex items-center justify-center flex-shrink-0 mt-1" style={{ backgroundColor: '#B8623F' }}>
                 3
               </span>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Track Your Progress</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="font-semibold text-lg text-gray-900 dark:text-white">Track Your Progress</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
                   Review your recognition accuracy, response times, and conversation history to improve your BioType understanding.
                 </p>
               </div>

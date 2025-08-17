@@ -179,7 +179,8 @@ export default function ImageRecognitionPracticePage() {
 
   if (showStats && userStats) {
     return (
-      <div className="container mx-auto p-6 max-w-6xl">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="container mx-auto p-6 max-w-6xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{config?.title || "Performance"} Statistics</h1>
           <Button onClick={() => setShowStats(false)} variant="outline">
@@ -188,14 +189,14 @@ export default function ImageRecognitionPracticePage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
             <div className="pb-2">
               <p className="text-gray-600 dark:text-gray-300">Total Attempts</p>
               <h3 className="text-3xl font-bold">{userStats.total_attempts}</h3>
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
             <div className="pb-2">
               <p className="text-gray-600 dark:text-gray-300">Accuracy</p>
               <h3 className="text-3xl font-bold text-green-600">
@@ -204,7 +205,7 @@ export default function ImageRecognitionPracticePage() {
             </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
             <div className="pb-2">
               <p className="text-gray-600 dark:text-gray-300">Avg Response Time</p>
               <h3 className="text-3xl font-bold">
@@ -215,7 +216,7 @@ export default function ImageRecognitionPracticePage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
             <div className="mb-4">
               <h3 className="text-xl font-semibold">Performance by Category</h3>
             </div>
@@ -234,7 +235,7 @@ export default function ImageRecognitionPracticePage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
             <div className="mb-4">
               <h3 className="text-xl font-semibold">Performance by Difficulty</h3>
             </div>
@@ -253,12 +254,14 @@ export default function ImageRecognitionPracticePage() {
             </div>
           </div>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto p-6 max-w-6xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{config?.title || "Recognition Practice"}</h1>
         <div className="flex gap-2">
@@ -287,7 +290,7 @@ export default function ImageRecognitionPracticePage() {
       )}
 
       {question ? (
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border mb-6">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4 mb-6" style={{ borderLeftColor: '#B8623F' }}>
           <div className="mb-6">
             <div className="flex justify-between items-start">
               <div>
@@ -397,18 +400,19 @@ export default function ImageRecognitionPracticePage() {
           </div>
         </div>
       ) : isLoading ? (
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderBottomColor: '#B8623F' }}></div>
           </div>
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow border">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border-l-4" style={{ borderLeftColor: '#B8623F' }}>
           <div className="flex items-center justify-center h-64">
             <p className="text-gray-500">Failed to load question. Please try again.</p>
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

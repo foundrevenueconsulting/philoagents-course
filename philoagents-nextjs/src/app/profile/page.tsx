@@ -20,12 +20,12 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-6">
           <Link 
             href="/dashboard"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
@@ -33,60 +33,61 @@ export default async function ProfilePage() {
         </div>
 
         <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-            <p className="text-gray-600 mt-2">
-              Manage your account information and preferences
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">🧠 Profile Settings</h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mt-2 max-w-2xl mx-auto">
+              Manage your BioTypes Arena account information and training preferences
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border-l-4 p-6" style={{ borderLeftColor: '#B8623F' }}>
+                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Profile Information</h2>
                 <ProfileForm user={user} />
               </div>
             </div>
 
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Subscription</h2>
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border-l-4 p-6" style={{ borderLeftColor: '#B8623F' }}>
+                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Subscription</h2>
                 {user.subscription ? (
                   <SubscriptionCard subscription={user.subscription} />
                 ) : (
-                  <div className="p-4 text-center text-gray-500">
+                  <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                     Setting up your subscription...
                   </div>
                 )}
               </div>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Account Statistics</h2>
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border-l-4 p-6" style={{ borderLeftColor: '#B8623F' }}>
+                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Account Statistics</h2>
                 <div className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Total Conversations</span>
-                    <span className="font-medium">{user.stats.totalConversations}</span>
+                    <span className="text-gray-600 dark:text-gray-300">Total Conversations</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{user.stats.totalConversations}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Member Since</span>
-                    <span className="font-medium">
+                    <span className="text-gray-600 dark:text-gray-300">Member Since</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Last Active</span>
-                    <span className="font-medium">
+                    <span className="text-gray-600 dark:text-gray-300">Last Active</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {new Date(user.stats.lastActive).toLocaleDateString()}
                     </span>
                   </div>
                   {user.stats.favoritePhilosophers.length > 0 && (
                     <div>
-                      <span className="text-gray-600">Favorite Philosophers</span>
+                      <span className="text-gray-600 dark:text-gray-300">Favorite Philosophers</span>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {user.stats.favoritePhilosophers.map((philosopher) => (
                           <span
                             key={philosopher}
-                            className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                            className="px-2 py-1 rounded-full text-sm text-white"
+                            style={{ backgroundColor: '#B8623F' }}
                           >
                             {philosopher}
                           </span>

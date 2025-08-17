@@ -223,7 +223,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-6 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg border-l-4 p-6 mb-6" style={{ borderLeftColor: '#B8623F' }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <button
@@ -275,7 +275,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
 
         {/* Main Conversation */}
         <div className="lg:col-span-3">
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 flex flex-col h-[800px]">
+          <div className="bg-white dark:bg-slate-800 rounded-lg border-l-4 flex flex-col h-[800px]" style={{ borderLeftColor: '#B8623F' }}>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {messages.length === 0 && !dialogueState?.topic ? (

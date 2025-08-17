@@ -28,7 +28,7 @@ export function ParticipantsList({ agents, currentSpeaker, dialogueState }: Part
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
+    <div className="bg-white dark:bg-slate-800 rounded-lg border-l-4 p-4" style={{ borderLeftColor: '#B8623F' }}>
       <div className="flex items-center gap-2 mb-4">
         <Bot className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         <h3 className="font-semibold text-gray-900 dark:text-white">

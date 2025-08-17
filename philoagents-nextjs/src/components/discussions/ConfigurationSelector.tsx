@@ -119,7 +119,8 @@ export function ConfigurationSelector({
             {recentConversations.map((conversation) => (
               <div
                 key={conversation.id}
-                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                className="bg-white dark:bg-slate-800 border-l-4 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                style={{ borderLeftColor: '#B8623F' }}
                 onClick={() => onResumeConversation?.(conversation.session_id)}
               >
                 <div className="flex items-start justify-between mb-2">
@@ -163,7 +164,8 @@ export function ConfigurationSelector({
         {configArray.map((config) => (
           <div
             key={config.id}
-            className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer group"
+            className="bg-white dark:bg-slate-800 rounded-lg border-l-4 overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer group"
+            style={{ borderLeftColor: '#B8623F' }}
             onClick={() => onSelectConfiguration(config)}
           >
             <div className="p-6">
