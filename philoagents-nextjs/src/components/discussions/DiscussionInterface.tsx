@@ -20,8 +20,8 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
   const [userInput, setUserInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
-  const [streamingMessage, setStreamingMessage] = useState<string>('');
-  const [streamingAgent, setStreamingAgent] = useState<string | null>(null);
+  const messageBuffer = useRef<string>('');
+  const currentStreamingAgent = useRef<string | null>(null);
   const [userFeedbackPrompt, setUserFeedbackPrompt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingState, setIsLoadingState] = useState(true);
@@ -43,7 +43,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, streamingMessage]);
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -101,8 +101,8 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
     if (isStreaming) return;
 
     setIsStreaming(true);
-    setStreamingMessage('');
-    setStreamingAgent(null);
+    messageBuffer.current = '';
+    currentStreamingAgent.current = null;
     setCurrentSpeaker(null);
 
     try {
@@ -125,13 +125,14 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
     switch (event.type) {
       case 'speaker_info':
         setCurrentSpeaker(event.agent_name || null);
-        setStreamingAgent(event.agent_name || null);
-        setStreamingMessage('');
+        currentStreamingAgent.current = event.agent_name || null;
+        messageBuffer.current = '';
         break;
 
       case 'agent_response':
         if (event.content) {
-          setStreamingMessage(prev => prev + event.content);
+          // Just collect in buffer, don't display yet
+          messageBuffer.current += event.content;
         }
         break;
 
@@ -142,20 +143,21 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
         break;
 
       case 'turn_complete':
-        // Finalize the streaming message
-        if (streamingMessage && streamingAgent) {
+        // Add the complete buffered message
+        if (messageBuffer.current && currentStreamingAgent.current) {
           const newMessage: Message = {
             id: `stream-${Date.now()}`,
             role: 'agent',
-            content: streamingMessage,
-            agent_name: streamingAgent,
+            content: messageBuffer.current,
+            agent_name: currentStreamingAgent.current,
             timestamp: new Date().toISOString(),
             metadata: {}
           };
           setMessages(prev => [...prev, newMessage]);
         }
-        setStreamingMessage('');
-        setStreamingAgent(null);
+        // Clear buffer
+        messageBuffer.current = '';
+        currentStreamingAgent.current = null;
         setCurrentSpeaker(null);
         break;
 
@@ -190,7 +192,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
     // No need to reload state - messages are already updated via streaming
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -296,24 +298,8 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                     />
                   ))}
                   
-                  {/* Streaming message */}
-                  {isStreaming && streamingMessage && streamingAgent && (
-                    <AgentMessage
-                      message={{
-                        id: 'streaming',
-                        role: 'agent',
-                        content: streamingMessage,
-                        agent_name: streamingAgent,
-                        timestamp: new Date().toISOString(),
-                        metadata: {}
-                      }}
-                      agentConfig={getAgentConfig(streamingAgent)}
-                      isStreaming={true}
-                    />
-                  )}
-
-                  {/* Current speaker indicator */}
-                  {isStreaming && currentSpeaker && !streamingMessage && (
+                  {/* Current speaker indicator - shows while buffering */}
+                  {isStreaming && currentSpeaker && (
                     <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -389,7 +375,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
                   <textarea
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     placeholder={
                       !dialogueState?.topic 
                         ? "Enter a topic or question to start the discussion..."
