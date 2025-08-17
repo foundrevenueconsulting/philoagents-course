@@ -1,21 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getAuthInfo } from "@/lib/auth";
 
 export default async function Home() {
-  let userId = null;
+  const { userId } = await getAuthInfo();
   
-  // Only use auth if Clerk keys are configured
-  const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
-  
-  if (hasClerkKey) {
-    const authResult = await auth();
-    userId = authResult.userId;
-    
-    if (userId) {
-      redirect("/dashboard");
-    }
+  if (userId) {
+    redirect("/dashboard");
   }
 
   return (

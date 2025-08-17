@@ -38,8 +38,8 @@ class RecognitionConfig:
 # Classical Temperaments Configuration
 TEMPERAMENTS_CONFIG = RecognitionConfig(
     type=RecognitionType.TEMPERAMENTS,
-    title="Temperament Recognition",
-    description="Identify classical temperaments from facial expressions and body language",
+    title="BioType Recognition",
+    description="Identify BioTypes from physical traits and body language",
     options=[
         RecognitionOption(
             id="choleric",

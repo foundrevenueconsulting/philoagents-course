@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { clerkAppearance } from '@/lib/clerk';
 import { Toaster } from "@/components/ui/toaster";
 import NavigationHeader from '@/components/NavigationHeader';
+import { isClerkConfigured } from '@/lib/auth';
 import "./globals.css";
 
 const geistSans = localFont({
@@ -27,9 +28,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
-
   const content = (
     <html lang="en">
       <body
@@ -42,7 +40,7 @@ export default function RootLayout({
     </html>
   );
 
-  if (hasClerkKey) {
+  if (isClerkConfigured()) {
     return (
       <ClerkProvider appearance={clerkAppearance}>
         {content}
