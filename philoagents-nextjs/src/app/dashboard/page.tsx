@@ -1,16 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server';
 import Link from 'next/link';
+import { getCurrentUserWithFeatures } from '@/lib/auth';
 
 export default async function Dashboard() {
-  let user = null;
-  
-  // Only use auth if Clerk keys are configured
-  const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
-  
-  if (hasClerkKey) {
-    user = await currentUser();
-  }
+  const user = await getCurrentUserWithFeatures();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">

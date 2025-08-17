@@ -13,7 +13,7 @@ export default function NavigationHeader() {
     return null;
   }
 
-  // Check if Clerk is configured
+  // Check if Clerk is configured (client-side fallback)
   const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
                      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
 

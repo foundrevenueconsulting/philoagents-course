@@ -16,9 +16,6 @@ function DiscussionsContent() {
   const searchParams = useSearchParams();
   const multiWayApiService = useMultiWayApi();
 
-  // Check if Clerk is configured
-  const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
 
   useEffect(() => {
     loadConfigurations();

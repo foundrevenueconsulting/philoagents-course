@@ -1,18 +1,10 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import ConversationHistoryClient from './ConversationHistoryClient';
+import { getCurrentUserWithFeatures, isClerkConfigured } from '@/lib/auth';
 
 export default async function ConversationsPage() {
-  let user = null;
-  
-  // Only use auth if Clerk keys are configured
-  const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
-  
-  if (hasClerkKey) {
-    user = await currentUser();
-  }
+  const user = await getCurrentUserWithFeatures();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
@@ -25,7 +17,7 @@ export default async function ConversationsPage() {
             <span className="text-gray-400">•</span>
             <span className="text-gray-600 dark:text-gray-300">Conversation History</span>
           </div>
-          {hasClerkKey && <UserButton afterSignOutUrl="/" />}
+          {isClerkConfigured() && <UserButton afterSignOutUrl="/" />}
         </div>
       </nav>
 
@@ -41,7 +33,7 @@ export default async function ConversationsPage() {
 
         <ConversationHistoryClient 
           userId={user?.id} 
-          hasAuth={!!hasClerkKey}
+          hasAuth={isClerkConfigured()}
         />
       </div>
     </div>

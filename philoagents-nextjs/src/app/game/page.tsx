@@ -1,15 +1,12 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import GameClient from './GameClient';
+import { getCurrentUserWithFeatures, isClerkConfigured } from '@/lib/auth';
 
 export default async function GamePage() {
-  // Only use auth if Clerk keys are configured
-  const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-                     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY !== 'pk_test_temp';
-  
-  if (hasClerkKey) {
-    await currentUser(); // Load user for auth context, but don't store locally since it's unused
+  // Load user for auth context if configured
+  if (isClerkConfigured()) {
+    await getCurrentUserWithFeatures();
   }
 
   return (
@@ -25,7 +22,7 @@ export default async function GamePage() {
           <h1 className="text-xl font-bold text-white">
             The Great Game of Life
           </h1>
-          {hasClerkKey && <UserButton />}
+          {isClerkConfigured() && <UserButton />}
         </div>
       </nav>
 
