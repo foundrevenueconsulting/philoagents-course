@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -10,7 +10,7 @@ import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 import { ConfigurationSelector } from '@/components/discussions/ConfigurationSelector';
 import { DiscussionInterface } from '@/components/discussions/DiscussionInterface';
 
-export default function DiscussionsPage() {
+function DiscussionsContent() {
   const [configurations, setConfigurations] = useState<Record<string, ConversationConfig>>({});
   const [selectedConfig, setSelectedConfig] = useState<ConversationConfig | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -161,5 +161,20 @@ export default function DiscussionsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DiscussionsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading discussions...</p>
+        </div>
+      </div>
+    }>
+      <DiscussionsContent />
+    </Suspense>
   );
 }
