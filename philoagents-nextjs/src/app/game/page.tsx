@@ -20,7 +20,7 @@ export default async function GamePage() {
             ← Back to Dashboard
           </Link>
           <h1 className="text-xl font-bold text-white">
-            The Great Game of Life
+            The BioTypes Arena
           </h1>
           {isClerkConfigured() && <UserButton />}
         </div>

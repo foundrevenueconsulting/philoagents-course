@@ -45,7 +45,7 @@ export class GameServer {
     // API info endpoint
     this.app.get('/api/info', (req, res) => {
       res.json({
-        name: 'Great Game of Life Multiplayer Server',
+        name: 'BioTypes Arena Multiplayer Server',
         version: '1.0.0',
         colyseus: "0.15.0", // TODO: Get actual version
         rooms: [], // TODO: Implement room listing

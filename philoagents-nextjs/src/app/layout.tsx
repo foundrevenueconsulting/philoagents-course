@@ -19,8 +19,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "The Great Game of Life - AI Philosophy Game",
-  description: "Engage in philosophical conversations with AI-powered historical philosophers",
+  title: "BioTypes Arena - AI Experiencial Training Platform",
+  description: "Learn and train with AI-powered BioType agents",
 };
 
 export default function RootLayout({
