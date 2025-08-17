@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Send, Users, Clock, MessageSquare, Pause, Play, Square } from 'lucide-react';
+import { ArrowLeft, Send, MessageSquare} from 'lucide-react';
 import { ConversationConfig, DialogueState, Message, StreamEvent } from '@/types/api';
 import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 import { AgentMessage } from './AgentMessage';
@@ -38,6 +38,7 @@ export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInt
         streamCleanupRef.current();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   useEffect(() => {

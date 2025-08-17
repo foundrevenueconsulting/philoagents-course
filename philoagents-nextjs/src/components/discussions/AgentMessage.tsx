@@ -1,7 +1,7 @@
 'use client';
 
 import { Message, AgentConfig } from '@/types/api';
-import { User, Bot, System, Crown, Lightbulb, AlertCircle, Scale } from 'lucide-react';
+import { User, Bot, Settings, Crown, Lightbulb, AlertCircle, Scale } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface AgentMessageProps {
@@ -56,7 +56,7 @@ export function AgentMessage({ message, agentConfig, isStreaming = false }: Agen
       <div className="flex justify-center">
         <div className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg p-3 max-w-2xl">
           <div className="flex items-center gap-2 mb-1">
-            <System className="w-4 h-4" />
+            <Settings className="w-4 h-4" />
             <span className="text-xs font-medium">System</span>
           </div>
           <p className="text-sm">{message.content}</p>

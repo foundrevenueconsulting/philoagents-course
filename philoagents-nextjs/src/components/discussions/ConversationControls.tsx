@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { RefreshCw, Download, Square, BarChart3, Settings } from 'lucide-react';
+import { RefreshCw, Download, BarChart3 } from 'lucide-react';
 import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 
 interface ConversationControlsProps {

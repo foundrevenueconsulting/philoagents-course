@@ -16,13 +16,6 @@ const roleIcons = {
   moderator: Scale
 };
 
-const roleDescriptions = {
-  lead: 'Leads discussion',
-  contributor: 'Contributes insights',
-  skeptic: 'Questions assumptions',
-  moderator: 'Facilitates dialogue'
-};
-
 export function ParticipantsList({ agents, currentSpeaker, dialogueState }: ParticipantsListProps) {
   const getAgentMessageCount = (agentId: string) => {
     if (!dialogueState) return 0;

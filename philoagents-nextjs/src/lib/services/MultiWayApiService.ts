@@ -146,7 +146,7 @@ export class MultiWayApiService {
     sort_order?: string;
   }): Promise<{
     conversations: ConversationSummary[];
-    filter: any;
+    filter: Record<string, unknown>;
     count: number;
   }> {
     const queryParams = new URLSearchParams();
@@ -161,7 +161,7 @@ export class MultiWayApiService {
     const url = `/test-conversations${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return await this.request<{
       conversations: ConversationSummary[];
-      filter: any;
+      filter: Record<string, unknown>;
       count: number;
     }>(url);
   }
@@ -171,14 +171,14 @@ export class MultiWayApiService {
    */
   async loadConversation(sessionId: string): Promise<{
     session_id: string;
-    dialogue_state: any;
-    metadata: any;
+    dialogue_state: DialogueState;
+    metadata: Record<string, unknown>;
     status: string;
   }> {
     return await this.request<{
       session_id: string;
-      dialogue_state: any;
-      metadata: any;
+      dialogue_state: DialogueState;
+      metadata: Record<string, unknown>;
       status: string;
     }>(`/api/multi-way/load/${sessionId}`);
   }
@@ -248,7 +248,7 @@ export class MultiWayApiService {
       });
     });
 
-    eventSource.addEventListener('response_end', (event) => {
+    eventSource.addEventListener('response_end', () => {
       onEvent({
         type: 'turn_complete',
         message: 'Response complete'
@@ -283,7 +283,7 @@ export class MultiWayApiService {
       });
     });
 
-    eventSource.addEventListener('done', (event) => {
+    eventSource.addEventListener('done', () => {
       eventSource.close();
       onComplete?.();
     });
@@ -345,7 +345,6 @@ export class MultiWayApiService {
         
         for (const line of lines) {
           if (line.startsWith('event: ')) {
-            const eventType = line.substring(7);
             continue;
           }
           

@@ -61,6 +61,7 @@ export default function ConversationHistory() {
 
   useEffect(() => {
     loadConversations(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const handleFilterChange = (key: string, value: string) => {

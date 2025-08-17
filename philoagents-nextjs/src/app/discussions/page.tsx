@@ -31,6 +31,7 @@ export default function DiscussionsPage() {
     if (resumeSessionId) {
       resumeConversation(resumeSessionId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const loadConfigurations = async () => {

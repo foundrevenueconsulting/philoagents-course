@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@clerk/nextjs';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { multiWayApiService } from '@/lib/services/MultiWayApiService';
 
 /**

@@ -47,16 +47,15 @@ export function ConfigurationSelector({
   onResumeConversation 
 }: ConfigurationSelectorProps) {
   const [recentConversations, setRecentConversations] = useState<ConversationSummary[]>([]);
-  const [loadingRecent, setLoadingRecent] = useState(false);
   const multiWayApiService = useMultiWayApi();
 
   useEffect(() => {
     loadRecentConversations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadRecentConversations = async () => {
     try {
-      setLoadingRecent(true);
       const response = await multiWayApiService.listConversations({
         limit: 5,
         sort_by: 'updated_at',
@@ -65,8 +64,6 @@ export function ConfigurationSelector({
       setRecentConversations(response.conversations);
     } catch (err) {
       console.error('Failed to load recent conversations:', err);
-    } finally {
-      setLoadingRecent(false);
     }
   };
 
