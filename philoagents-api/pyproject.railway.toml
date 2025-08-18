@@ -18,10 +18,24 @@ dependencies = [
     "pymongo>=4.9.2",
     "loguru>=0.7.3",
     "langchain-community>=0.3.17",
+    "langchain-huggingface>=0.1.2",
     "wikipedia>=1.4.0",
     "pydantic>=2.10.6",
     "datasketch>=1.6.5",
+    "python-jose[cryptography]>=3.3.0",
+    "python-multipart>=0.0.9",
+    "clerk-backend-api==3.1.1",
+    "ipykernel>=6.29.5",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "ruff>=0.7.2",
+]
+
+[tool.pip]
+extra-index-url = "https://download.pytorch.org/whl/cpu/torch_stable.html"
 
 [build-system]
 requires = ["hatchling"]

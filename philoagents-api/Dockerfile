@@ -22,6 +22,7 @@ COPY --from=builder /app/.venv /app/.venv
 # Copy the application into the container.
 COPY src/philoagents philoagents/
 COPY tools tools/
+COPY verify_deps.py ./
 
 # Replace HuggingFace embeddings with OpenAI for Railway
 COPY embeddings.railway.py philoagents/application/rag/embeddings.py
@@ -29,6 +30,9 @@ COPY retrievers.railway.py philoagents/application/rag/retrievers.py
 
 # Set PATH to include the virtual environment.
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Verify all dependencies are properly installed
+RUN python verify_deps.py
 
 # Expose port
 EXPOSE 8000
