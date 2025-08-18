@@ -23,6 +23,7 @@ from philoagents.config import settings
 from philoagents.infrastructure.clerk_auth import (
     get_current_user,
     get_current_user_from_query_or_header,
+    get_current_user_if_enforced,
     User,
 )
 from philoagents.application.image_recognition_service import ImageRecognitionService
@@ -398,6 +399,34 @@ async def load_conversation(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Debug endpoints for authentication
+@app.get("/debug/auth-config")
+async def debug_auth_config():
+    """Debug endpoint to check authentication configuration"""
+    from philoagents.infrastructure.clerk_auth import authenticator
+    
+    return {
+        "enforce_authentication": settings.ENFORCE_AUTHENTICATION,
+        "clerk_enabled": authenticator.clerk_enabled,
+        "clerk_secret_key_set": bool(settings.CLERK_SECRET_KEY),
+        "clerk_secret_key_length": len(settings.CLERK_SECRET_KEY) if settings.CLERK_SECRET_KEY else 0,
+        "jwt_secret_key_set": bool(authenticator.jwt_secret_key),
+        "jwt_algorithm": authenticator.jwt_algorithm,
+        "clerk_client_available": authenticator.clerk_client is not None
+    }
+
+
+@app.get("/debug/auth-test")
+async def debug_auth_test(current_user: User = Depends(get_current_user)):
+    """Debug endpoint that requires authentication to test token flow"""
+    return {
+        "success": True,
+        "user_id": current_user.id,
+        "user_email": current_user.email,
+        "message": "Authentication successful"
+    }
+
+
 # Image Recognition Practice endpoints
 @app.get("/image-recognition/config")
 async def get_recognition_config():
@@ -428,9 +457,9 @@ async def get_recognition_config():
 @app.get("/image-recognition/random")
 async def get_random_question(
     exclude_item_id: Optional[str] = None,
-    # current_user: User = Depends(get_current_user)  # TODO: Re-enable auth after debugging
+    current_user: Optional[User] = Depends(get_current_user_if_enforced)
 ):
-    """Get a random image recognition question (requires authentication)"""
+    """Get a random image recognition question (authentication controlled by ENFORCE_AUTHENTICATION)"""
     try:
         question = await image_recognition_service.get_random_question(exclude_item_id=exclude_item_id)
         return question
@@ -441,9 +470,9 @@ async def get_random_question(
 @app.get("/image-recognition/{item_id}")
 async def get_question_by_id(
     item_id: str, 
-    # current_user: User = Depends(get_current_user)  # TODO: Re-enable auth after debugging
+    current_user: Optional[User] = Depends(get_current_user_if_enforced)
 ):
-    """Get a specific image recognition question by ID (requires authentication)"""
+    """Get a specific image recognition question by ID (authentication controlled by ENFORCE_AUTHENTICATION)"""
     try:
         question = await image_recognition_service.get_question_by_id(item_id)
         if not question:
@@ -479,13 +508,13 @@ async def submit_answer(
 @app.get("/image-recognition/stats/{user_id}")
 async def get_user_stats(
     user_id: str, 
-    # current_user: User = Depends(get_current_user)  # TODO: Re-enable auth after debugging
+    current_user: Optional[User] = Depends(get_current_user_if_enforced)
 ):
-    """Get user performance statistics (temporarily no auth for debugging)"""
+    """Get user performance statistics (authentication controlled by ENFORCE_AUTHENTICATION)"""
     try:
-        # TODO: Re-enable user validation after auth is fixed
-        # if user_id != current_user.id:
-        #     raise HTTPException(status_code=403, detail="Access denied")
+        # If authentication is enforced, validate user access
+        if current_user and user_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied")
 
         stats = await image_recognition_service.get_user_stats(user_id)
         return stats

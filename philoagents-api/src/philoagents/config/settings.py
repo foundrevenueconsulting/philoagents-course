@@ -58,6 +58,9 @@ class Settings(BaseSettings):
     CLERK_SECRET_KEY: str | None = Field(
         default=None, description="Clerk secret key for authentication"
     )
+    ENFORCE_AUTHENTICATION: bool = Field(
+        default=True, description="Whether to enforce authentication on protected endpoints"
+    )
 
     # --- Paths Configuration ---
     EVALUATION_DATASET_FILE_PATH: Path = Path("data/evaluation_dataset.json")

@@ -50,22 +50,33 @@ class ClerkAuthenticator:
         """
         Verify JWT token using Clerk SDK.
         """
+        logger.info(f"🔍 Starting token verification...")
+        logger.info(f"🔧 Clerk enabled: {self.clerk_enabled}")
+        logger.info(f"🏢 Clerk client available: {self.clerk_client is not None}")
+        
         # Try Clerk verification first
         if self.clerk_enabled and self.clerk_client:
             try:
+                logger.info("🎯 Attempting Clerk verification...")
                 # Decode JWT to get session info
                 from jose import jwt
 
                 unverified_payload = jwt.decode(
                     token, key="", options={"verify_signature": False}
                 )
+                logger.info(f"📄 Unverified payload: {unverified_payload}")
                 session_id = unverified_payload.get("sid")
+                logger.info(f"🆔 Session ID: {session_id}")
 
                 if session_id:
                     # Verify the session using Clerk API
+                    logger.info(f"📞 Calling Clerk API to verify session: {session_id}")
                     session = self.clerk_client.sessions.get(session_id=session_id)
+                    logger.info(f"📋 Session response: {session}")
+                    logger.info(f"📊 Session status: {getattr(session, 'status', 'unknown')}")
 
                     if session and session.status == "active":
+                        logger.info(f"✅ Session verified successfully for user: {session.user_id}")
                         return {
                             "sub": session.user_id,
                             "user_id": session.user_id,
@@ -73,9 +84,16 @@ class ClerkAuthenticator:
                             "email": None,
                             "username": None,
                         }
+                    else:
+                        logger.warning(f"❌ Session not active or invalid: {session}")
+                else:
+                    logger.warning("❌ No session ID found in token")
 
             except Exception as session_error:
-                logger.debug(f"Clerk session verification failed: {session_error}")
+                logger.error(f"💥 Clerk session verification failed: {session_error}")
+                logger.error(f"🔍 Error type: {type(session_error).__name__}")
+                import traceback
+                logger.error(f"📚 Traceback: {traceback.format_exc()}")
 
         # Fallback to generic JWT verification
         if self.jwt_secret_key:
@@ -125,10 +143,14 @@ async def get_current_user(
     try:
         # Extract token from Authorization header
         token = credentials.credentials
+        logger.info(f"🔐 Attempting to verify token: {token[:20]}...")
+        logger.info(f"🔧 Clerk enabled: {authenticator.clerk_enabled}")
+        logger.info(f"🔑 CLERK_SECRET_KEY set: {bool(settings.CLERK_SECRET_KEY)}")
 
         # Verify token and extract payload
         payload = authenticator.verify_token(token)
         if not payload:
+            logger.warning("❌ Token verification returned None")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication token",
@@ -136,11 +158,13 @@ async def get_current_user(
             )
 
         # Extract user information
+        logger.info(f"✅ Token verified successfully, extracting user info")
         user = authenticator.extract_user_from_payload(payload)
+        logger.info(f"👤 User extracted: {user.id}")
         return user
 
     except ValueError as e:
-        logger.error(f"Token validation error: {e}")
+        logger.error(f"💥 Token validation error: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token format",
@@ -219,3 +243,28 @@ async def get_current_user_from_query_or_header(
             detail="Authentication failed",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+async def get_current_user_if_enforced(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(
+        HTTPBearer(auto_error=False)
+    ),
+) -> Optional[User]:
+    """
+    Authentication dependency that only enforces authentication if ENFORCE_AUTHENTICATION is True.
+    Returns None if authentication is disabled or if no credentials provided.
+    """
+    from philoagents.config import settings
+    
+    if not settings.ENFORCE_AUTHENTICATION:
+        logger.info("🔓 Authentication enforcement disabled - allowing unauthenticated access")
+        return None
+        
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required but no credentials provided",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    return await get_current_user(credentials)
