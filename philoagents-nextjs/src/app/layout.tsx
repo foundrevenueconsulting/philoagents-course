@@ -19,7 +19,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "BioTypes Arena - AI Experiencial Training Platform",
+  title: "BioTypes Arena - AI Experiential Training Platform",
   description: "Learn and train with AI-powered BioType agents",
 };
 
