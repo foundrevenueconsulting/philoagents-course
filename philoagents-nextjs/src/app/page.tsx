@@ -97,7 +97,7 @@ export default async function Home() {
               <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div className="text-2xl mb-2">🜄</div>
                 <div className="font-semibold text-blue-800 dark:text-blue-200">Phlegmatic</div>
-                <div className="text-blue-600 dark:text-blue-300">Earth • Peaceful • Steady</div>
+                <div className="text-blue-600 dark:text-blue-300">Water • Peaceful • Steady</div>
               </div>
               <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <div className="text-2xl mb-2">🜁</div>
@@ -107,7 +107,7 @@ export default async function Home() {
               <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                 <div className="text-2xl mb-2">🜃</div>
                 <div className="font-semibold text-purple-800 dark:text-purple-200">Melancholic</div>
-                <div className="text-purple-600 dark:text-purple-300">Water • Analytical • Thoughtful</div>
+                <div className="text-purple-600 dark:text-purple-300">Earth • Analytical • Thoughtful</div>
               </div>
             </div>
           </div>
