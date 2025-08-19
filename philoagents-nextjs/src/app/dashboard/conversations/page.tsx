@@ -27,7 +27,7 @@ export default async function ConversationsPage() {
             Your Philosophical Conversations
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Review your past discussions with AI philosophers and continue where you left off.
+            Review your past discussions and continue where you left off.
           </p>
         </div>
 
