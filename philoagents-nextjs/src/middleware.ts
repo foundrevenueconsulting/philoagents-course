@@ -31,10 +31,7 @@ export default clerkMiddleware(async (auth, request) => {
     request.nextUrl.pathname.startsWith('/_next/') ||
     request.nextUrl.pathname.includes('.')
   ) {
-    // Still apply auth protection for non-public API routes
-    if (!isPublicRoute(request)) {
-      await auth.protect();
-    }
+    // Let API routes handle their own authentication
     return NextResponse.next();
   }
 
