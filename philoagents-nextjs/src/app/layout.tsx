@@ -31,16 +31,18 @@ export default function RootLayout({
 }>) {
   const content = (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
         {/* Humblytics Tracking Code */}
         {process.env.NEXT_PUBLIC_HUMBLYTICS_ID && (
           <Script
             src={`https://app.humblytics.com/hmbl.min.js?id=${process.env.NEXT_PUBLIC_HUMBLYTICS_ID}`}
-            strategy="afterInteractive"
+            strategy="beforeInteractive"
           />
         )}
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <NavigationHeader />
         {children}
         <Toaster />
