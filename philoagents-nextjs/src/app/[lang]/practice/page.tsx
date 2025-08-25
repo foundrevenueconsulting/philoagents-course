@@ -9,5 +9,5 @@ export default async function PracticePage({ params }: Props) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  return <PracticeContent dict={dict} locale={lang} />;
+  return <PracticeContent dict={dict} />;
 }
