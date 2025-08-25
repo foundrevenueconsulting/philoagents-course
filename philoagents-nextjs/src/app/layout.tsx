@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { ClerkProvider } from '@clerk/nextjs';
 import { clerkAppearance } from '@/lib/clerk';
 import { Toaster } from "@/components/ui/toaster";
@@ -33,6 +34,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Humblytics Tracking Code */}
+        {process.env.NEXT_PUBLIC_HUMBLYTICS_ID && (
+          <Script
+            src={`https://app.humblytics.com/hmbl.min.js?id=${process.env.NEXT_PUBLIC_HUMBLYTICS_ID}`}
+            strategy="afterInteractive"
+          />
+        )}
         <NavigationHeader />
         {children}
         <Toaster />
