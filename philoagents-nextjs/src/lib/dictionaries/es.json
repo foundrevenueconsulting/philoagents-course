@@ -46,7 +46,11 @@
     "submit_answer": "Enviar Respuesta",
     "failed_to_load": "Error al cargar la pregunta. Por favor, inténtalo de nuevo.",
     "statistics": "Estadísticas",
-    "recognition_practice": "Práctica de Reconocimiento"
+    "recognition_practice": "Práctica de Reconocimiento",
+    "stats": "Estadísticas",
+    "new_question": "Nueva Pregunta",
+    "back_to_practice": "Volver a la Práctica",
+    "next_question": "Siguiente Pregunta"
   },
   "profile": {
     "back_to_dashboard": "Volver al Panel",

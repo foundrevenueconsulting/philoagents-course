@@ -179,7 +179,7 @@ export function PracticeContent({ dict }: PracticeContentProps) {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{config?.title || dict.practice.statistics}</h1>
           <Button onClick={() => setShowStats(false)} variant="outline">
-            Back to Practice
+            {dict.practice.back_to_practice}
           </Button>
         </div>
 
@@ -262,11 +262,11 @@ export function PracticeContent({ dict }: PracticeContentProps) {
         <div className="flex gap-2">
           <Button onClick={() => setShowStats(true)} variant="outline" size="sm">
             📊
-            Stats
+            {dict.practice.stats}
           </Button>
           <Button onClick={loadNewQuestion} variant="outline" size="sm" disabled={loading}>
             🔄
-            New Question
+            {dict.practice.new_question}
           </Button>
         </div>
       </div>
@@ -388,7 +388,7 @@ export function PracticeContent({ dict }: PracticeContentProps) {
                 variant="outline"
                 disabled={loading}
               >
-                Next Question
+                {dict.practice.next_question}
               </Button>
             )}
           </div>

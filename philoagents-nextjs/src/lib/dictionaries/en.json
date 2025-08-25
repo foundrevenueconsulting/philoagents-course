@@ -46,7 +46,11 @@
     "submit_answer": "Submit Answer",
     "failed_to_load": "Failed to load question. Please try again.",
     "statistics": "Statistics",
-    "recognition_practice": "Recognition Practice"
+    "recognition_practice": "Recognition Practice",
+    "stats": "Stats",
+    "new_question": "New Question",
+    "back_to_practice": "Back to Practice",
+    "next_question": "Next Question"
   },
   "profile": {
     "back_to_dashboard": "Back to Dashboard",
