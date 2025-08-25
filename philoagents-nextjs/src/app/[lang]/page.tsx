@@ -1,4 +1,4 @@
-import { getDictionary, Locale } from '@/lib/dictionaries';
+import { Locale } from '@/lib/dictionaries';
 import { redirect } from 'next/navigation';
 import { getAuthInfo } from '@/lib/auth';
 

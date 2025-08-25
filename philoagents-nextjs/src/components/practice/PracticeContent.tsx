@@ -6,11 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
-import { Dictionary, Locale } from '@/lib/dictionaries';
+import { Dictionary } from '@/lib/dictionaries';
 
 interface PracticeContentProps {
   dict: Dictionary;
-  locale: Locale;
 }
 
 interface ImageRecognitionOption {
@@ -57,7 +56,7 @@ interface RecognitionConfig {
   }>;
 }
 
-export function PracticeContent({ dict, locale }: PracticeContentProps) {
+export function PracticeContent({ dict }: PracticeContentProps) {
   const { getToken } = useAuth();
   const [question, setQuestion] = useState<ImageRecognitionQuestion | null>(null);
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -86,7 +85,7 @@ export function PracticeContent({ dict, locale }: PracticeContentProps) {
     setSelectedOption("");
     
     try {
-      let url = "/image-recognition/random";
+      const url = "/image-recognition/random";
       const response = await apiCall(url);
       if (response.ok) {
         const data = await response.json();
@@ -170,6 +169,7 @@ export function PracticeContent({ dict, locale }: PracticeContentProps) {
     loadConfig();
     loadNewQuestion();
     loadUserStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (showStats && userStats) {

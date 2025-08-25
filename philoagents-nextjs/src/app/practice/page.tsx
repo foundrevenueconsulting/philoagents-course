@@ -164,6 +164,7 @@ export default function ImageRecognitionPracticePage() {
     loadConfig();
     loadNewQuestion();
     loadUserStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getDifficultyColor = (difficulty: string) => {

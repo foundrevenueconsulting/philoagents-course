@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { ClerkProvider } from '@clerk/nextjs';
 import { clerkAppearance } from '@/lib/clerk';
 import { Toaster } from "@/components/ui/toaster";
-import NavigationHeader from '@/components/NavigationHeader';
 import { isClerkConfigured } from '@/lib/auth';
 import "./globals.css";
 
