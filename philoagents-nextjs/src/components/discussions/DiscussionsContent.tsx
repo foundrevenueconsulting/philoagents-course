@@ -95,9 +95,9 @@ export function DiscussionsContent({ dict, locale }: DiscussionsContentProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderBottomColor: '#B8623F' }}></div>
           <p className="text-gray-600 dark:text-gray-300">{dict.discussions.loading}</p>
         </div>
       </div>
@@ -105,32 +105,34 @@ export function DiscussionsContent({ dict, locale }: DiscussionsContentProps) {
   }
 
   return (
-    <div>
-      {error && (
-        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <p className="text-red-800 dark:text-red-200">{error}</p>
-        </div>
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p className="text-red-800 dark:text-red-200">{error}</p>
+          </div>
+        )}
 
-      {!selectedConfig ? (
-        <ConfigurationSelector
-          configurations={configurations}
-          onSelectConfiguration={handleConfigSelect}
-          onResumeConversation={resumeConversation}
-          dict={dict}
-          locale={locale}
-        />
-      ) : (
-        sessionId && (
-          <DiscussionInterface
-            config={selectedConfig}
-            sessionId={sessionId}
-            onBack={handleBackToSelection}
+        {!selectedConfig ? (
+          <ConfigurationSelector
+            configurations={configurations}
+            onSelectConfiguration={handleConfigSelect}
+            onResumeConversation={resumeConversation}
             dict={dict}
             locale={locale}
           />
-        )
-      )}
+        ) : (
+          sessionId && (
+            <DiscussionInterface
+              config={selectedConfig}
+              sessionId={sessionId}
+              onBack={handleBackToSelection}
+              dict={dict}
+              locale={locale}
+            />
+          )
+        )}
+      </div>
     </div>
   );
 }

@@ -61,5 +61,5 @@ export default clerkMiddleware(async (auth, request) => {
 })
 
 export const config = {
-  matcher: ["/((?!_next|api|favicon.ico).*)"],
+  matcher: ["/((?!_next|favicon.ico).*)"],
 };
