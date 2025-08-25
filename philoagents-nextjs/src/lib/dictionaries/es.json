@@ -34,6 +34,20 @@
     "failed_load_recent": "Error al cargar conversaciones recientes:",
     "config_not_found": "Configuración no encontrada para esta conversación"
   },
+  "practice": {
+    "total_attempts": "Intentos Totales",
+    "accuracy": "Precisión",
+    "avg_response_time": "Tiempo Promedio de Respuesta",
+    "performance_by_category": "Rendimiento por Categoría",
+    "performance_by_difficulty": "Rendimiento por Dificultad",
+    "total_accuracy": "Total: {total} • Precisión: {accuracy}%",
+    "correct": "¡Correcto!",
+    "incorrect": "Incorrecto",
+    "submit_answer": "Enviar Respuesta",
+    "failed_to_load": "Error al cargar la pregunta. Por favor, inténtalo de nuevo.",
+    "statistics": "Estadísticas",
+    "recognition_practice": "Práctica de Reconocimiento"
+  },
   "dashboard": {
     "welcome_back": "Bienvenido de nuevo",
     "welcome_subtitle": "¿Listo para continuar tu jornada de entrenamiento en BioTipos? Elige tu próxima aventura de aprendizaje.",

@@ -34,6 +34,20 @@
     "failed_load_recent": "Failed to load recent conversations:",
     "config_not_found": "Configuration not found for this conversation"
   },
+  "practice": {
+    "total_attempts": "Total Attempts",
+    "accuracy": "Accuracy",
+    "avg_response_time": "Avg Response Time",
+    "performance_by_category": "Performance by Category",
+    "performance_by_difficulty": "Performance by Difficulty", 
+    "total_accuracy": "Total: {total} • Accuracy: {accuracy}%",
+    "correct": "Correct!",
+    "incorrect": "Incorrect",
+    "submit_answer": "Submit Answer",
+    "failed_to_load": "Failed to load question. Please try again.",
+    "statistics": "Statistics",
+    "recognition_practice": "Recognition Practice"
+  },
   "dashboard": {
     "welcome_back": "Welcome back",
     "welcome_subtitle": "Ready to continue your BioType training journey? Choose your next learning adventure.",
