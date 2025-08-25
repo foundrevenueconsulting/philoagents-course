@@ -296,10 +296,9 @@ export default function SettingsClientContent({ userId, dict }: SettingsClientCo
         <button
           onClick={savePreferences}
           disabled={saving}
-          className="px-6 py-2 rounded-md transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 rounded-md transition-colors text-white disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
           style={{ 
-            backgroundColor: saving ? '#9ca3af' : '#B8623F',
-            ':hover': { backgroundColor: '#a0522d' }
+            backgroundColor: saving ? '#9ca3af' : '#B8623F'
           }}
         >
           {saving ? dict.settings.saving : dict.settings.save_preferences}
