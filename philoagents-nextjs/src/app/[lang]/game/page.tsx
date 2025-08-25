@@ -2,8 +2,16 @@ import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import GameClient from './GameClient';
 import { getCurrentUserWithFeatures, isClerkConfigured } from '@/lib/auth';
+import { getDictionary, Locale } from '@/lib/dictionaries';
 
-export default async function GamePage() {
+interface Props {
+  params: Promise<{ lang: Locale }>;
+}
+
+export default async function GamePage({ params }: Props) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+  
   // Load user for auth context if configured
   if (isClerkConfigured()) {
     await getCurrentUserWithFeatures();
@@ -14,19 +22,19 @@ export default async function GamePage() {
       <nav className="bg-black/50 backdrop-blur-sm absolute top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link 
-            href="/dashboard"
+            href={`/${lang}/dashboard`}
             className="text-white hover:text-gray-300 transition-colors"
           >
-            ← Back to Dashboard
+            {dict.game.back_to_dashboard}
           </Link>
           <h1 className="text-xl font-bold text-white">
-            The BioTypes Arena
+            {dict.game.title}
           </h1>
           {isClerkConfigured() && <UserButton />}
         </div>
       </nav>
 
-      <GameClient />
+      <GameClient dict={dict} />
     </div>
   );
 }

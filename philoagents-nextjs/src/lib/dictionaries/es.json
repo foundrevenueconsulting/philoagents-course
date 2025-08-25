@@ -97,6 +97,11 @@
     "upgrade_plan_desc": "Obtén más conversaciones y características premium",
     "manage_subscription": "Administrar Suscripción"
   },
+  "game": {
+    "back_to_dashboard": "← Volver al Panel",
+    "title": "La Arena de los BioTipos",
+    "loading_game": "Cargando Juego de la Vida..."
+  },
   "dashboard": {
     "welcome_back": "Bienvenido de nuevo",
     "welcome_subtitle": "¿Listo para continuar tu jornada de entrenamiento en BioTipos? Elige tu próxima aventura de aprendizaje.",

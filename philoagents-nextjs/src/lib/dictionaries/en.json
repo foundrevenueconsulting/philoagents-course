@@ -97,6 +97,11 @@
     "upgrade_plan_desc": "Get more conversations and premium features",
     "manage_subscription": "Manage Subscription"
   },
+  "game": {
+    "back_to_dashboard": "← Back to Dashboard",
+    "title": "The BioTypes Arena",
+    "loading_game": "Loading Game of Life..."
+  },
   "dashboard": {
     "welcome_back": "Welcome back",
     "welcome_subtitle": "Ready to continue your BioType training journey? Choose your next learning adventure.",
