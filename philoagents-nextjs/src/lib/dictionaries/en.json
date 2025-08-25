@@ -34,6 +34,28 @@
     "failed_load_recent": "Failed to load recent conversations:",
     "config_not_found": "Configuration not found for this conversation"
   },
+  "dashboard": {
+    "welcome_back": "Welcome back",
+    "welcome_subtitle": "Ready to continue your BioType training journey? Choose your next learning adventure.",
+    "biotype_discussions": "🗣️ BioType Counsel Discussions",
+    "biotype_discussions_desc": "Watch different AI Biotype agents debate and collaborate on a topic of your choice.",
+    "biotype_recognition": "🧠 BioType Recognition Practice",
+    "biotype_recognition_desc": "Train your ability to recognize BioTypes from images.",
+    "enter_game": "🎮 Enter Game World",
+    "enter_game_desc": "Join the interactive philosophy world and chat with AI philosophers.",
+    "conversation_history": "💬 Conversation History",
+    "conversation_history_desc": "Review your past discussions and insights.",
+    "profile_settings": "👤 Profile & Settings",
+    "profile_settings_desc": "Manage your profile, subscription, and preferences.",
+    "new_feature": "NEW FEATURE",
+    "quick_start": "🚀 Quick Start Guide",
+    "step_1_title": "Start BioType Recognition Practice",
+    "step_1_desc": "Click \"BioType Recognition Practice\" to train your ability to identify biological temperaments from facial features and body language.",
+    "step_2_title": "Explore BioType Counsel Discussions", 
+    "step_2_desc": "Watch different AI BioType agents debate and collaborate on topics of your choice in real-time conversations.",
+    "step_3_title": "Track Your Progress",
+    "step_3_desc": "Review your recognition accuracy, response times, and conversation history to improve your BioType understanding."
+  },
   "meta": {
     "site_title": "BioTypes Arena - AI Experiential Training Platform",
     "site_description": "Learn and train with AI-powered BioType agents",

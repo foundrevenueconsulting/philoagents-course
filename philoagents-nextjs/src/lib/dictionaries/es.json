@@ -34,6 +34,28 @@
     "failed_load_recent": "Error al cargar conversaciones recientes:",
     "config_not_found": "Configuración no encontrada para esta conversación"
   },
+  "dashboard": {
+    "welcome_back": "Bienvenido de nuevo",
+    "welcome_subtitle": "¿Listo para continuar tu jornada de entrenamiento en BioTipos? Elige tu próxima aventura de aprendizaje.",
+    "biotype_discussions": "🗣️ Discusiones del Consejo de BioTipos",
+    "biotype_discussions_desc": "Observa diferentes agentes de IA BioTipo debatir y colaborar en un tema de tu elección.",
+    "biotype_recognition": "🧠 Práctica de Reconocimiento de BioTipos",
+    "biotype_recognition_desc": "Entrena tu habilidad para reconocer BioTipos desde imágenes.",
+    "enter_game": "🎮 Entrar al Mundo del Juego",
+    "enter_game_desc": "Únete al mundo filosófico interactivo y conversa con filósofos de IA.",
+    "conversation_history": "💬 Historial de Conversaciones",
+    "conversation_history_desc": "Revisa tus discusiones pasadas e ideas.",
+    "profile_settings": "👤 Perfil y Configuración",
+    "profile_settings_desc": "Administra tu perfil, suscripción y preferencias.",
+    "new_feature": "NUEVA FUNCIÓN",
+    "quick_start": "🚀 Guía de Inicio Rápido",
+    "step_1_title": "Comenzar Práctica de Reconocimiento de BioTipos",
+    "step_1_desc": "Haz clic en \"Práctica de Reconocimiento de BioTipos\" para entrenar tu habilidad de identificar temperamentos biológicos desde características faciales y lenguaje corporal.",
+    "step_2_title": "Explorar Discusiones del Consejo de BioTipos",
+    "step_2_desc": "Observa diferentes agentes de IA BioTipo debatir y colaborar en temas de tu elección en conversaciones en tiempo real.",
+    "step_3_title": "Seguir tu Progreso",
+    "step_3_desc": "Revisa tu precisión de reconocimiento, tiempos de respuesta e historial de conversaciones para mejorar tu comprensión de BioTipos."
+  },
   "meta": {
     "site_title": "Arena de BioTipos - Plataforma de Entrenamiento Experiencial con IA",
     "site_description": "Aprende y entrena con agentes de BioTipo impulsados por IA",

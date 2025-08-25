@@ -1,7 +1,14 @@
 import Link from 'next/link';
 import { getCurrentUserWithFeatures } from '@/lib/auth';
+import { getDictionary, Locale } from '@/lib/dictionaries';
 
-export default async function Dashboard() {
+interface Props {
+  params: Promise<{ lang: Locale }>;
+}
+
+export default async function Dashboard({ params }: Props) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
   const user = await getCurrentUserWithFeatures();
 
   return (
@@ -9,10 +16,10 @@ export default async function Dashboard() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            🧠 Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
+            🧠 {dict.dashboard.welcome_back}{user?.firstName ? `, ${user.firstName}` : ''}!
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Ready to continue your BioType training journey? Choose your next learning adventure.
+            {dict.dashboard.welcome_subtitle}
           </p>
         </div>
 
@@ -20,80 +27,80 @@ export default async function Dashboard() {
           
 
           <Link
-            href="/discussions"
+            href={`/${lang}/discussions`}
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
             style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              🗣️ BioType Counsel Discussions
+              {dict.dashboard.biotype_discussions}
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Watch different AI Biotype agents debate and collaborate on a topic of your choice.
+              {dict.dashboard.biotype_discussions_desc}
             </p>
             <div className="mt-3 text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: '#B8623F', color: 'white' }}>
-              NEW FEATURE
+              {dict.dashboard.new_feature}
             </div>
           </Link>
 
           <Link
-            href="/practice"
+            href={`/${lang}/practice`}
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
             style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              🧠 BioType Recognition Practice
+              {dict.dashboard.biotype_recognition}
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Train your ability to recognize BioTypes from images.
+              {dict.dashboard.biotype_recognition_desc}
             </p>
             <div className="mt-3 text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: '#B8623F', color: 'white' }}>
-              NEW FEATURE
+              {dict.dashboard.new_feature}
             </div>
           </Link>
           
           <Link
-            href="/game"
+            href={`/${lang}/game`}
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
             style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              🎮 Enter Game World
+              {dict.dashboard.enter_game}
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Join the interactive philosophy world and chat with AI philosophers.
+              {dict.dashboard.enter_game_desc}
             </p>
           </Link>
 
           <Link
-            href="/dashboard/conversations"
+            href={`/${lang}/dashboard/conversations`}
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
             style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              💬 Conversation History
+              {dict.dashboard.conversation_history}
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Review your past discussions and insights.
+              {dict.dashboard.conversation_history_desc}
             </p>
           </Link>
 
           <Link
-            href="/profile"
+            href={`/${lang}/profile`}
             className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-l-4"
             style={{ borderLeftColor: '#B8623F' }}
           >
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              👤 Profile & Settings
+              {dict.dashboard.profile_settings}
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Manage your profile, subscription, and preferences.
+              {dict.dashboard.profile_settings_desc}
             </p>
           </Link>
         </div>
 
         <div className="mt-16 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-xl border-t-4" style={{ borderTopColor: '#B8623F' }}>
           <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
-            🚀 Quick Start Guide
+            {dict.dashboard.quick_start}
           </h3>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
@@ -101,9 +108,9 @@ export default async function Dashboard() {
                 1
               </span>
               <div>
-                <p className="font-semibold text-lg text-gray-900 dark:text-white">Start BioType Recognition Practice</p>
+                <p className="font-semibold text-lg text-gray-900 dark:text-white">{dict.dashboard.step_1_title}</p>
                 <p className="text-gray-600 dark:text-gray-300 mt-1">
-                  Click &quot;BioType Recognition Practice&quot; to train your ability to identify biological temperaments from facial features and body language.
+                  {dict.dashboard.step_1_desc}
                 </p>
               </div>
             </div>
@@ -112,9 +119,9 @@ export default async function Dashboard() {
                 2
               </span>
               <div>
-                <p className="font-semibold text-lg text-gray-900 dark:text-white">Explore BioType Counsel Discussions</p>
+                <p className="font-semibold text-lg text-gray-900 dark:text-white">{dict.dashboard.step_2_title}</p>
                 <p className="text-gray-600 dark:text-gray-300 mt-1">
-                  Watch different AI BioType agents debate and collaborate on topics of your choice in real-time conversations.
+                  {dict.dashboard.step_2_desc}
                 </p>
               </div>
             </div>
@@ -123,9 +130,9 @@ export default async function Dashboard() {
                 3
               </span>
               <div>
-                <p className="font-semibold text-lg text-gray-900 dark:text-white">Track Your Progress</p>
+                <p className="font-semibold text-lg text-gray-900 dark:text-white">{dict.dashboard.step_3_title}</p>
                 <p className="text-gray-600 dark:text-gray-300 mt-1">
-                  Review your recognition accuracy, response times, and conversation history to improve your BioType understanding.
+                  {dict.dashboard.step_3_desc}
                 </p>
               </div>
             </div>
