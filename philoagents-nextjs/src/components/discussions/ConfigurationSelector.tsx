@@ -5,10 +5,14 @@ import { ConversationConfig, ConversationSummary } from '@/types/api';
 import { Users, Lightbulb, Briefcase, FlaskConical, Heart, Clock, MessageSquare } from 'lucide-react';
 import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 
+import { Dictionary, Locale } from '@/lib/dictionaries';
+
 interface ConfigurationSelectorProps {
   configurations: Record<string, ConversationConfig>;
   onSelectConfiguration: (config: ConversationConfig) => void;
   onResumeConversation?: (sessionId: string) => void;
+  dict: Dictionary;
+  locale: Locale;
 }
 
 const formatIcons: Record<string, React.ReactNode> = {
@@ -44,10 +48,12 @@ const roleColors: Record<string, string> = {
 export function ConfigurationSelector({ 
   configurations, 
   onSelectConfiguration,
-  onResumeConversation 
+  onResumeConversation,
+  dict,
+  locale
 }: ConfigurationSelectorProps) {
   const [recentConversations, setRecentConversations] = useState<ConversationSummary[]>([]);
-  const multiWayApiService = useMultiWayApi();
+  const multiWayApiService = useMultiWayApi(locale);
 
   useEffect(() => {
     loadRecentConversations();
@@ -73,11 +79,11 @@ export function ConfigurationSelector({
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
     
     if (diffInHours < 1) {
-      return 'Just now';
+      return dict.discussions.just_now;
     } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
+      return dict.discussions.hours_ago.replace('{hours}', Math.floor(diffInHours).toString());
     } else {
-      return `${Math.floor(diffInHours / 24)}d ago`;
+      return dict.discussions.days_ago.replace('{days}', Math.floor(diffInHours / 24).toString());
     }
   };
   const configArray = Object.values(configurations);
@@ -89,10 +95,10 @@ export function ConfigurationSelector({
           <Users className="w-16 h-16 mx-auto" />
         </div>
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          No Configurations Available
+          {dict.discussions.no_configs}
         </h3>
         <p className="text-gray-600 dark:text-gray-300">
-          Please check your API connection and try again.
+          {dict.discussions.no_configs_description}
         </p>
       </div>
     );
@@ -102,10 +108,10 @@ export function ConfigurationSelector({
     <div>
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Choose a Discussion Format
+          {dict.discussions.title}
         </h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Select a conversation configuration to watch AI agents collaborate and debate in real-time.
+          {dict.discussions.subtitle}
         </p>
       </div>
 
@@ -113,7 +119,7 @@ export function ConfigurationSelector({
       {recentConversations.length > 0 && (
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Conversations
+            {dict.discussions.recent_conversations}
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {recentConversations.map((conversation) => (
@@ -132,7 +138,7 @@ export function ConfigurationSelector({
                       ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
                       : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                   }`}>
-                    {conversation.status === 'completed' ? 'Complete' : 'Active'}
+                    {conversation.status === 'completed' ? dict.discussions.complete : dict.discussions.active}
                   </span>
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
@@ -157,7 +163,7 @@ export function ConfigurationSelector({
       )}
 
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        Start New Discussion
+        {dict.discussions.start_new}
       </h3>
 
       <div className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -194,7 +200,7 @@ export function ConfigurationSelector({
               {/* Agents */}
               <div className="space-y-3">
                 <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                  Participants ({config.agents.length})
+                  {dict.discussions.participants} ({config.agents.length})
                 </h4>
                 <div className="space-y-2">
                   {config.agents.map((agent) => (
@@ -225,10 +231,10 @@ export function ConfigurationSelector({
               {/* Footer */}
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-600">
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>Max {config.max_rounds} rounds</span>
+                  <span>{dict.discussions.max_rounds.replace('{rounds}', config.max_rounds.toString())}</span>
                   {config.allow_human_feedback && (
                     <span className="inline-flex items-center gap-1">
-                      💬 Human feedback enabled
+                      {dict.discussions.human_feedback_enabled}
                     </span>
                   )}
                 </div>
@@ -243,7 +249,7 @@ export function ConfigurationSelector({
 
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Click on any configuration to start a new multi-way discussion
+          {dict.discussions.click_to_start}
         </p>
       </div>
     </div>

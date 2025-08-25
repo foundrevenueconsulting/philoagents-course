@@ -7,14 +7,17 @@ import { useMultiWayApi } from '@/hooks/useMultiWayApi';
 import { AgentMessage } from './AgentMessage';
 import { ParticipantsList } from './ParticipantsList';
 import { ConversationControls } from './ConversationControls';
+import { Dictionary, Locale } from '@/lib/dictionaries';
 
 interface DiscussionInterfaceProps {
   config: ConversationConfig;
   sessionId: string;
   onBack: () => void;
+  dict?: Dictionary;
+  locale?: Locale;
 }
 
-export function DiscussionInterface({ config, sessionId, onBack }: DiscussionInterfaceProps) {
+export function DiscussionInterface({ config, sessionId, onBack, dict, locale }: DiscussionInterfaceProps) {
   const [dialogueState, setDialogueState] = useState<DialogueState | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState('');

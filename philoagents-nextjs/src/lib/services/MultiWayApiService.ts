@@ -12,6 +12,7 @@ import {
 export class MultiWayApiService {
   private apiUrl: string;
   private getToken: (() => Promise<string | null>) | null = null;
+  private locale: string = 'en';
 
   constructor() {
     this.apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -24,6 +25,13 @@ export class MultiWayApiService {
     this.getToken = getToken;
   }
 
+  /**
+   * Set the locale for API requests
+   */
+  setLocale(locale: string) {
+    this.locale = locale;
+  }
+
   private async request<T>(
     endpoint: string, 
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET', 
@@ -32,6 +40,7 @@ export class MultiWayApiService {
     const url = `${this.apiUrl}${endpoint}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Accept-Language': this.locale,
     };
 
     // Add authorization header if token getter is available

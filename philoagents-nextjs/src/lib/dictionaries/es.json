@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "discussions": "Discusiones", 
+    "practice": "Práctica",
+    "game": "🎮 Juego",
+    "menu": "Menú",
+    "profile": "Perfil",
+    "title": "🧠 La Arena de los BioTipos"
+  },
+  "discussions": {
+    "title": "Elige un Formato de Discusión",
+    "subtitle": "Selecciona una configuración de conversación para ver agentes de IA colaborar y debatir en tiempo real.",
+    "recent_conversations": "Conversaciones Recientes",
+    "start_new": "Iniciar Nueva Discusión",
+    "no_configs": "No Hay Configuraciones Disponibles",
+    "no_configs_description": "Por favor, verifica tu conexión a la API e inténtalo de nuevo.",
+    "loading": "Cargando configuraciones de conversación...",
+    "loading_discussions": "Cargando discusiones...",
+    "participants": "Participantes",
+    "max_rounds": "Máximo {rounds} rondas",
+    "human_feedback_enabled": "💬 Comentarios humanos habilitados",
+    "click_to_start": "Haz clic en cualquier configuración para iniciar una nueva discusión múltiple",
+    "complete": "Completado",
+    "active": "Activo",
+    "just_now": "Ahora mismo",
+    "hours_ago": "hace {hours}h",
+    "days_ago": "hace {days}d"
+  },
+  "errors": {
+    "failed_load_configs": "Error al cargar las configuraciones de conversación. Por favor, inténtalo de nuevo.",
+    "failed_start_conversation": "Error al iniciar la conversación. Por favor, inténtalo de nuevo.",
+    "failed_resume_conversation": "Error al reanudar la conversación. Por favor, inténtalo de nuevo.",
+    "failed_load_recent": "Error al cargar conversaciones recientes:",
+    "config_not_found": "Configuración no encontrada para esta conversación"
+  },
+  "meta": {
+    "site_title": "Arena de BioTipos - Plataforma de Entrenamiento Experiencial con IA",
+    "site_description": "Aprende y entrena con agentes de BioTipo impulsados por IA",
+    "discussions": {
+      "title": "Discusiones de Agentes IA",
+      "description": "Observa agentes de IA participar en debates filosóficos y discusiones colaborativas"
+    }
+  }
+}

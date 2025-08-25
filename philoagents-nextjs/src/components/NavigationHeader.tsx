@@ -4,12 +4,18 @@ import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
+import { Dictionary, Locale } from '@/lib/dictionaries';
 
-export default function NavigationHeader() {
+interface NavigationHeaderProps {
+  dict: Dictionary;
+  locale: Locale;
+}
+
+export default function NavigationHeader({ dict, locale }: NavigationHeaderProps) {
   const pathname = usePathname();
   
   // Don't show navigation on game page, auth pages, or home page
-  if (pathname === '/game' || pathname.startsWith('/sign-') || pathname === '/') {
+  if (pathname === `/${locale}/game` || pathname.startsWith('/sign-') || pathname === '/' || pathname === `/${locale}`) {
     return null;
   }
 
@@ -23,55 +29,55 @@ export default function NavigationHeader() {
         <div className="flex justify-between items-center">
           {/* Left side - Logo and main nav */}
           <div className="flex items-center space-x-6">
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href={`/${locale}/dashboard`} className="flex items-center space-x-2">
               <span className="text-xl font-bold text-white">
-                🧠 The BioTypes Arena
+                {dict.nav.title}
               </span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-4">
               <Link 
-                href="/dashboard"
+                href={`/${locale}/dashboard`}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === '/dashboard' 
+                  pathname === `/${locale}/dashboard` 
                     ? 'bg-white/20 text-white font-semibold' 
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                Dashboard
+                {dict.nav.dashboard}
               </Link>
               
               <Link 
-                href="/discussions"
+                href={`/${locale}/discussions`}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname.startsWith('/discussions')
+                  pathname.startsWith(`/${locale}/discussions`)
                     ? 'bg-white/20 text-white font-semibold' 
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                Discussions
+                {dict.nav.discussions}
               </Link>
               
               <Link 
-                href="/practice"
+                href={`/${locale}/practice`}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === '/practice'
+                  pathname === `/${locale}/practice`
                     ? 'bg-white/20 text-white font-semibold' 
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                Practice
+                {dict.nav.practice}
               </Link>
               
               <Link 
-                href="/game"
+                href={`/${locale}/game`}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === '/game'
+                  pathname === `/${locale}/game`
                     ? 'bg-white/20 text-white font-semibold' 
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                🎮 Game
+                {dict.nav.game}
               </Link>
             </div>
           </div>
@@ -80,9 +86,9 @@ export default function NavigationHeader() {
           <div className="flex items-center space-x-4">
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <Link href="/dashboard">
+              <Link href={`/${locale}/dashboard`}>
                 <Button variant="ghost" size="sm">
-                  Menu
+                  {dict.nav.menu}
                 </Button>
               </Link>
             </div>
@@ -90,7 +96,7 @@ export default function NavigationHeader() {
             {/* User profile */}
             {hasClerkKey ? (
               <UserButton 
-                afterSignOutUrl="/"
+                afterSignOutUrl={`/${locale}`}
                 appearance={{
                   elements: {
                     avatarBox: "w-8 h-8"
@@ -98,9 +104,9 @@ export default function NavigationHeader() {
                 }}
               />
             ) : (
-              <Link href="/profile">
+              <Link href={`/${locale}/profile`}>
                 <Button variant="ghost" size="sm">
-                  Profile
+                  {dict.nav.profile}
                 </Button>
               </Link>
             )}

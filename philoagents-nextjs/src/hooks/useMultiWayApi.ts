@@ -3,14 +3,15 @@
 import { useAuth } from '@clerk/nextjs';
 import { useEffect } from 'react';
 import { multiWayApiService } from '@/lib/services/MultiWayApiService';
+import { Locale } from '@/lib/dictionaries';
 
 /**
  * Hook that provides an authenticated MultiWayApiService instance
  */
-export function useMultiWayApi() {
+export function useMultiWayApi(locale?: Locale) {
   const { getToken } = useAuth();
 
-  // Configure the API service with the token getter
+  // Configure the API service with the token getter and locale
   useEffect(() => {
     multiWayApiService.setTokenGetter(async () => {
       try {
@@ -21,7 +22,11 @@ export function useMultiWayApi() {
         return null;
       }
     });
-  }, [getToken]);
+
+    if (locale) {
+      multiWayApiService.setLocale(locale);
+    }
+  }, [getToken, locale]);
 
   return multiWayApiService;
 }

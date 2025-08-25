@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "discussions": "Discussions", 
+    "practice": "Practice",
+    "game": "🎮 Game",
+    "menu": "Menu",
+    "profile": "Profile",
+    "title": "🧠 The BioTypes Arena"
+  },
+  "discussions": {
+    "title": "Choose a Discussion Format",
+    "subtitle": "Select a conversation configuration to watch AI agents collaborate and debate in real-time.",
+    "recent_conversations": "Recent Conversations",
+    "start_new": "Start New Discussion",
+    "no_configs": "No Configurations Available",
+    "no_configs_description": "Please check your API connection and try again.",
+    "loading": "Loading conversation configurations...",
+    "loading_discussions": "Loading discussions...",
+    "participants": "Participants",
+    "max_rounds": "Max {rounds} rounds",
+    "human_feedback_enabled": "💬 Human feedback enabled",
+    "click_to_start": "Click on any configuration to start a new multi-way discussion",
+    "complete": "Complete",
+    "active": "Active",
+    "just_now": "Just now",
+    "hours_ago": "{hours}h ago",
+    "days_ago": "{days}d ago"
+  },
+  "errors": {
+    "failed_load_configs": "Failed to load conversation configurations. Please try again.",
+    "failed_start_conversation": "Failed to start conversation. Please try again.",
+    "failed_resume_conversation": "Failed to resume conversation. Please try again.",
+    "failed_load_recent": "Failed to load recent conversations:",
+    "config_not_found": "Configuration not found for this conversation"
+  },
+  "meta": {
+    "site_title": "BioTypes Arena - AI Experiential Training Platform",
+    "site_description": "Learn and train with AI-powered BioType agents",
+    "discussions": {
+      "title": "AI Agent Discussions",
+      "description": "Watch AI agents engage in philosophical debates and collaborative discussions"
+    }
+  }
+}
