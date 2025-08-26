@@ -39,6 +39,32 @@ Find detailed setup and usage instructions in the [INSTALL_AND_USAGE.md](INSTALL
 
 **Pro tip:** Read the accompanying articles first for a better understanding of the system you'll build.
 
+## 🌍 Recent Updates: Full Internationalization
+
+The project now includes **complete internationalization (i18n) support** in the Next.js frontend:
+
+### ✨ New Features Added
+- **Multi-language support**: English (default) and Spanish
+- **Automatic locale detection** from browser preferences
+- **URL-based routing**: `/en/dashboard` and `/es/dashboard`
+- **Type-safe translation system** with full TypeScript support
+- **Comprehensive coverage**: All UI elements, forms, validation messages, and dynamic content
+
+### 🎯 Localized Components
+- **Navigation & Menus**: All interface elements translated
+- **Practice Module**: Image recognition with localized questions and feedback
+- **Settings & Profile**: User preferences with language-aware forms
+- **Discussion Forums**: Multi-way conversation interface
+- **Game Integration**: Phaser.js game with localized loading states
+- **Error Handling**: API errors and validation messages in user's language
+
+### 🔧 Technical Implementation
+- Smart middleware for locale detection and routing
+- Dictionary-based translation system (`en.json`, `es.json`)
+- Parameter interpolation for dynamic content
+- SEO-friendly localized URLs
+- Fallback mechanisms for unsupported locales
+
 ## 💡 Questions and Troubleshooting
 
 Have questions or running into issues? We're here to help!

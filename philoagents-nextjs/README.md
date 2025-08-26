@@ -10,6 +10,7 @@ This Next.js application serves as the modern frontend for PhiloAgents, integrat
 - **Type-safe API integration** with the Python FastAPI backend
 - **Real-time multiplayer** via Colyseus WebSocket server
 - **Enterprise-grade TypeScript** with comprehensive type safety
+- **🌍 Full internationalization (i18n)** with English and Spanish support
 
 ## 🚀 Quick Start
 
@@ -50,6 +51,110 @@ npm run start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## 🌍 Internationalization (i18n)
+
+The application features **complete internationalization** with support for multiple languages:
+
+### Supported Languages
+- **English (en)** - Default language
+- **Spanish (es)** - Full translation coverage
+
+### Key Features
+
+#### **Dynamic Locale Detection**
+- Automatic browser language detection via `Accept-Language` header
+- URL-based locale routing: `/en/dashboard`, `/es/dashboard`
+- Fallback to English for unsupported locales
+
+#### **Comprehensive Translation Coverage**
+- **Navigation & UI Elements**: All menus, buttons, and interface text
+- **Form Labels & Validation**: Error messages, input placeholders, validation text
+- **Dynamic Content**: Date formatting, number formatting, pluralization
+- **Error Messages**: API errors, validation messages, system notifications
+- **Game Integration**: Loading messages and game interface text
+
+#### **Localized Page Structure**
+All main application pages support localization:
+```
+/[lang]/
+├── dashboard/         # User dashboard
+├── discussions/       # Multi-way conversations
+├── practice/          # Image recognition practice
+├── game/              # Phaser.js game interface
+├── profile/           # User profile and settings
+└── (auth)/           # Authentication pages
+```
+
+#### **Type-Safe Translation System**
+```typescript
+// Dictionary structure with full type safety
+interface Dictionary {
+  nav: {
+    dashboard: string;
+    discussions: string;
+    practice: string;
+    // ... all navigation items
+  };
+  practice: {
+    total_attempts: string;
+    accuracy: string;
+    submit_answer: string;
+    // ... all practice-related translations
+  };
+  // ... comprehensive coverage
+}
+
+// Usage in components
+const { dict } = await getDictionary('es');
+<Button>{dict.practice.submit_answer}</Button> // "Enviar Respuesta"
+```
+
+#### **Advanced Localization Features**
+- **Parameter Interpolation**: `"Total: {total} • Accuracy: {accuracy}%"`
+- **Pluralization Support**: Dynamic text based on quantity
+- **Date/Time Localization**: Locale-aware formatting
+- **Error Message Localization**: API errors translated based on user locale
+- **SEO-Friendly URLs**: Language-specific routes for better search indexing
+
+### Implementation Details
+
+#### **Middleware Integration**
+```typescript
+// Automatic locale detection and routing
+const locale = getLocale(request); // Browser language detection
+const newUrl = new URL(`/${locale}${pathname}`, request.url);
+return NextResponse.redirect(newUrl);
+```
+
+#### **Component Localization Pattern**
+```typescript
+// All pages receive dictionary and locale
+interface PageProps {
+  params: { lang: Locale };
+}
+
+export default async function Page({ params: { lang } }: PageProps) {
+  const dict = await getDictionary(lang);
+  return <LocalizedComponent dict={dict} />;
+}
+```
+
+#### **Translation Files**
+- `src/lib/dictionaries/en.json` - English translations
+- `src/lib/dictionaries/es.json` - Spanish translations
+- Type-safe dictionary loading via `getDictionary(locale)`
+
+### Recent Localization Enhancements
+
+The latest implementation includes:
+✅ **Complete UI Translation** - All interface elements localized  
+✅ **Form Validation Messages** - Error messages in user's language  
+✅ **Dynamic Content Formatting** - Dates, times, and numbers  
+✅ **Practice Module** - Full i18n support for image recognition  
+✅ **Settings & Profile** - User preferences with localized labels  
+✅ **Game Integration** - Loading states and game UI text  
+✅ **Discussion Forums** - Multi-way conversation interface
 
 ## 🛡️ Type Safety Architecture
 
