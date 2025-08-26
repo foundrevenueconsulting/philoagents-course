@@ -11,7 +11,8 @@ Follow these steps:
 7. Ensure code passes linting and type checking
 8. Review the original Github issue to ensure all aspects of the feature have been addressed
 9. Confirm with the user the feature is completed to their expectations
-10. Create a descriptive commit message
-11. Push and create a PR
+10. Assess if any of the README files should be updated based on the newly implemented work
+11. Create a descriptive commit message
+12. Push and create a PR
 
 REMEMBER to use the GitHub CLI (`gh`) for all GitHub-related tasks.
